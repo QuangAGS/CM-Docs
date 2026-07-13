@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EGAL Knowledge Index v1.2 - Production SoC</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap');
+        :root { --primary: #1F4E79; }
+        body { font-family: 'Inter', system_ui, sans-serif; margin: 0; padding: 20px; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); color: #1e2937; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { font-family: 'Space Grotesk', sans-serif; color: var(--primary); font-size: 2.2rem; margin: 0 0 8px 0; }
+        .subtitle { color: #64748b; font-size: 1.05rem; }
+        .controls { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        .search-box { flex: 1; min-width: 280px; }
+        #searchInput { width: 100%; padding: 14px 20px; font-size: 15px; border: 2px solid #cbd5e1; border-radius: 12px; outline: none; transition: all 0.2s; }
+        #searchInput:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(31, 78, 121, 0.1); }
+        .layer-filters { display: flex; gap: 8px; flex-wrap: wrap; }
+        .filter-btn { padding: 8px 16px; border: 2px solid #cbd5e1; background: white; border-radius: 9999px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        
+        /* Cấu trúc Table CSS */
+        table { width: 100%; background: white; border-radius: 16px; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05); border: 1px solid #e2e8f0; overflow: hidden; border-collapse: collapse; }
+        th { background: #f8fafc; color: #475569; padding: 16px 14px; text-align: left; font-weight: 600; font-size: 13px; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 14px; border-bottom: 1px solid #f1f5f9; font-size: 14px; vertical-align: top; }
+        
+        /* Tách inline styles thành các CSS class chuyên biệt để dập tắt cảnh báo Linters */
+        .th-id { width: 10%; }
+        .th-uri { width: 35%; }
+        .th-layer { width: 10%; }
+        .th-keywords { width: 25%; }
+        .th-edges { width: 20%; }
+        
+        .doc-id { font-weight: 700; }
+        .doc-meta { font-weight: 600; color: #0f172a; margin-bottom: 2px; }
+        .doc-keywords { color: #475569; font-size: 13px; line-height: 1.5; }
+        .loading-state { text-align: center; padding: 30px; color: #64748b; }
+        .error-state { text-align: center; color: #ef4444; font-weight: 600; }
+        .no-edge-state { color: #cbd5e1; font-size: 12px; }
+
+        .layer-badge { display: inline-block; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+        .layer-0 { background: #dbeafe; color: #1e40af; }
+        .layer-1 { background: #e0e7ff; color: #3730a3; }
+        .layer-2 { background: #fef3c7; color: #854d0e; }
+        .layer-3 { background: #f3e8ff; color: #6b21a8; }
+        .layer-4 { background: #dcfce7; color: #166534; font-weight: 700; }
+        
+        .uri-link { display: inline-block; font-family: monospace; color: #0f766e; font-size: 12px; background: #f0fdfa; padding: 3px 8px; border-radius: 4px; text-decoration: none; margin-top: 5px; border: 1px solid #ccfbf1; transition: all 0.15s; }
+        .uri-link:hover { background: #ccfbf1; color: #042f2e; transform: translateY(-1px); }
+        .raw-url { font-family: monospace; color: #64748b; font-size: 11px; margin-top: 4px; word-break: break-all; }
+        
+        .relations-wrapper { display: flex; flex-direction: column; gap: 4px; }
+        .relation-tag { font-size: 12px; padding: 2px 6px; background: #f1f5f9; border-radius: 4px; color: #334155; }
+        .relation-type { font-weight: 600; color: #b45309; }
+        .stats { margin-top: 20px; text-align: right; font-size: 13px; color: #64748b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>EGAL Knowledge Index v1.2</h1>
+            <p class="subtitle">Decoupled Architecture • Dynamic Semantic Graph Integration</p>
+        </header>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Tìm kiếm theo ID, URI, tên tài liệu hoặc từ khóa...">
+            </div>
+            <div class="layer-filters">
+                <button class="filter-btn active" data-layer="all">Tất cả</button>
+                <button class="filter-btn" data-layer="0">Layer 0 - Meta</button>
+                <button class="filter-btn" data-layer="1">Layer 1 - Foundation</button>
+                <button class="filter-btn" data-layer="2">Layer 2 - Domain</button>
+                <button class="filter-btn" data-layer="3">Layer 3 - Platform</button>
+                <button class="filter-btn" data-layer="4">Layer 4 - KOS</button>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th class="th-id">ID</th>
+                    <th class="th-uri">Tên tài liệu / Interactive URI</th>
+                    <th class="th-layer">Layer</th>
+                    <th class="th-keywords">Semantic Keywords</th>
+                    <th class="th-edges">Directed Edges (Graph)</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="5" class="loading-state">Đang tải đồ thị tri thức từ hệ thống...</td></tr>
+            </tbody>
+        </table>
+
+        <div class="stats" id="stats">Hiển thị <span id="visibleCount">0</span> / <span id="totalCount">0</span> tài liệu</div>
+    </div>
+
+    <script>
+        let documents = [];
+        let currentFilter = 'all';
+
+        async function loadKnowledgeGraph() {
+            try {
+                const response = await fetch('egal_knowledge_graph.json');
+                if (!response.ok) throw new Error('Không thể fetch cấu trúc dữ liệu.');
+                documents = await response.json();
+                initEngine();
+            } catch (err) {
+                document.getElementById('tableBody').innerHTML = 
+                    `<tr><td colspan="5" class="error-state">⚠️ LỖI KIẾN TRÚC HẠ TẦNG: ${err.message}<br>Vui lòng đảm bảo tệp 'egal_knowledge_graph.json' nằm chung thư mục.</td></tr>`;
+            }
+        }
+
+        function renderTable(filteredDocs) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            filteredDocs.forEach(doc => {
+                const row = document.createElement('tr');
+                
+                let edgesHtml = '<div class="relations-wrapper">';
+                if(doc.edges && doc.edges.length > 0) {
+                    doc.edges.forEach(edge => {
+                        edgesHtml += `<span class="relation-tag">➔ <span class="relation-type">${edge.relationType}</span>: ${edge.target}</span>`;
+                    });
+                } else { edgesHtml += '<span class="no-edge-state">No directed edge</span>'; }
+                edgesHtml += '</div>';
+
+                // TOÀN BỘ INLINE STYLE ĐÃ ĐƯỢC CHUYỂN THÀNH CLASS (DẬP TẮT LỖI)
+                row.innerHTML = `
+                    <td class="doc-id">${doc.id}</td>
+                    <td>
+                        <div class="doc-meta">${doc.name}</div>
+                        <a href="${doc.uri}" target="_blank" class="uri-link" title="Mở trực quan trên GitHub">
+                            📄 View Doc 🔗
+                        </a>
+                        <div class="raw-url"><strong>Raw URL:</strong> ${doc.contentUrl || 'N/A'}</div>
+                    </td>
+                    <td><span class="layer-badge layer-${doc.layer}">Layer ${doc.layer}</span></td>
+                    <td class="doc-keywords">${doc.keywords.join(', ')}</td>
+                    <td>${edgesHtml}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('visibleCount').textContent = filteredDocs.length;
+            document.getElementById('totalCount').textContent = documents.length;
+        }
+
+        function filterAndRender() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            let filtered = documents;
+
+            if (currentFilter !== 'all') filtered = filtered.filter(doc => doc.layer === currentFilter);
+
+            if (searchTerm) {
+                filtered = filtered.filter(doc => 
+                    doc.id.toLowerCase().includes(searchTerm) ||
+                    doc.uri.toLowerCase().includes(searchTerm) ||
+                    doc.name.toLowerCase().includes(searchTerm) ||
+                    doc.keywords.some(k => k.toLowerCase().includes(searchTerm)) ||
+                    (doc.edges && doc.edges.some(e => e.target.toLowerCase().includes(searchTerm) || e.relationType.toLowerCase().includes(searchTerm)))
+                );
+            }
+            renderTable(filtered);
+        }
+
+        function initEngine() {
+            renderTable(documents);
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', filterAndRender);
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.layer;
+                    filterAndRender();
+                });
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === "/" && document.activeElement.tagName === "BODY") {
+                    e.preventDefault();
+                    searchInput.focus();
+                }
+            });
+        }
+
+        window.onload = loadKnowledgeGraph;
+    </script>
+</body>
+</html>
