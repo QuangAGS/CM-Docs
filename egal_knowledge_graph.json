@@ -1,0 +1,388 @@
+[
+  {
+    "id": "EDA",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/SERIE-A/EDA.md",
+    "name": "Documentation Architecture (EDA) v3.0",
+    "layer": "0",
+    "version": "3.0.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/SERIE-A/EDA.md",
+    "keywords": ["Document Container", "Semantic Routing", "Q-ROUT Matrix"],
+    "edges": [
+      { "target": "EADC", "relationType": "ConstrainedBy" },
+      { "target": "CORE-002", "relationType": "Implements" }
+    ]
+  },
+  {
+    "id": "EADC",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/SERIE-A/EADC.md",
+    "name": "Enterprise Architecture Domain Constitution v2.1",
+    "layer": "0",
+    "version": "2.1.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/SERIE-A/EADC.md",
+    "keywords": ["Domain", "Responsibility Space", "10 Principles"],
+    "edges": [
+      { "target": "EDA", "relationType": "DocumentedIn" },
+      { "target": "CORE-002", "relationType": "ExtendedBy" }
+    ]
+  },
+  {
+    "id": "EGDS-Catalog",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/SERIE-A/EGDS%20CATALOG%20SPECIFICATION.md",
+    "name": "EGDS Catalog Specification v2.1",
+    "layer": "0",
+    "version": "2.1.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/SERIE-A/EGDS%20CATALOG%20SPECIFICATION.md",
+    "keywords": ["Domain Standard", "Canonical Domain Contract"],
+    "edges": [
+      { "target": "EDA", "relationType": "DependsOn" }
+    ]
+  },
+  {
+    "id": "VOL I-02",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/SERIE-B/Serie%20B%20-%20%5BVOL%20I%20-%2002%5D%20BUSINESS%20DOCTRINE%20BLUEPRINT%20%28REVISED%20V2.1%29.md",
+    "name": "Business Doctrine Blueprint (Revised V2.1)",
+    "layer": "1",
+    "version": "2.1.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/SERIE-B/Serie%20B%20-%20%5BVOL%20I%20-%2002%5D%20BUSINESS%20DOCTRINE%20BLUEPRINT%20%28REVISED%20V2.1%29.md",
+    "keywords": ["Business Principles", "Data Sovereignty", "Consensus"],
+    "edges": [
+      { "target": "VOL I-03", "relationType": "Precedes" },
+      { "target": "CORE-006", "relationType": "GovernedBy" }
+    ]
+  },
+  {
+    "id": "VOL I-03",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/SERIE-B/Serie%20B%20-%20%5BVOL%20I%20-%2003%5D%20PRODUCT%20ARCHITECTURE%20BLUEPRINT%20%28REVISED%20V2.1%29.md",
+    "name": "Product Architecture Blueprint (Revised V2.1)",
+    "layer": "1",
+    "version": "2.1.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/SERIE-B/Serie%20B%20-%20%5BVOL%20I%20-%2003%5D%20PRODUCT%20ARCHITECTURE%20BLUEPRINT%20%28REVISED%20V2.1%29.md",
+    "keywords": ["CQRS", "Immutable Ledger", "Outbox Pattern", "ACXD"],
+    "edges": [
+      { "target": "CORE-005", "relationType": "AssembledBy" },
+      { "target": "VOL II-06", "relationType": "IntegratesWith" }
+    ]
+  },
+  {
+    "id": "VOL II-04",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/SERIE-B/Serie%20B%20-%20%5BVOL%20II%20-%2004%5D%20Lineage%20%26%20Member%20Domain%20Specification%20V2.md",
+    "name": "Lineage & Member Domain Specification",
+    "layer": "2",
+    "version": "1.0.0",
+    "status": "DRAFT",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/SERIE-B/Serie%20B%20-%20%5BVOL%20II%20-%2004%5D%20Lineage%20%26%20Member%20Domain%20Specification%20V2.md",
+    "keywords": ["Member", "Branch", "Lineage Graph"],
+    "edges": [
+      { "target": "VOL II-05", "relationType": "CoexistsWith" },
+      { "target": "VOL II-06", "relationType": "FlowsTo" }
+    ]
+  },
+  {
+    "id": "VOL II-05",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/SERIE-B/%5BVOL%20II%20-%2005%5D%20EVENT%20%26%20RITUAL%20DOMAIN%20SPECIFICATION%20%28REVISED%20V3.1%29.md",
+    "name": "Event & Ritual Domain Specification",
+    "layer": "2",
+    "version": "1.0.0",
+    "status": "DRAFT",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/SERIE-B/%5BVOL%20II%20-%2005%5D%20EVENT%20%26%20RITUAL%20DOMAIN%20SPECIFICATION%20%28REVISED%20V3.1%29.md",
+    "keywords": ["Clan Event", "Ritual Task", "Calendar Engine"],
+    "edges": [
+      { "target": "VOL II-04", "relationType": "References" },
+      { "target": "VOL II-06", "relationType": "TriggersFinancials" }
+    ]
+  },
+  {
+    "id": "VOL II-06",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/SERIE-B/%5BVOL%20II%20-%2006%5D%20FINANCIAL%20%26%20GOVERNANCE%20LEDGER%20DOMAIN%20SPECIFICATION%20%28REVISED%20V2.1%29.md",
+    "name": "Financial & Governance Ledger Domain",
+    "layer": "2",
+    "version": "1.0.0",
+    "status": "DRAFT",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/SERIE-B/%5BVOL%20II%20-%2006%5D%20FINANCIAL%20%26%20GOVERNANCE%20LEDGER%20DOMAIN%20SPECIFICATION%20%28REVISED%20V2.1%29.md",
+    "keywords": ["Multi-Ledger", "Append-only", "Hash Chain", "Guardian Approval"],
+    "edges": [
+      { "target": "VOL I-03", "relationType": "ImplementsPattern" },
+      { "target": "CORE-005", "relationType": "ScopedIn" }
+    ]
+  },
+  {
+    "id": "VOL II-07",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/SERIE-B/%5BVOL%20II%20-%2007%5D%20COMMUNICATION%20%26%20HONOR%20DOMAIN%20SPECIFICATION%20%28REVISED%20V2.1%29.md",
+    "name": "Communication & Honor Domain Specification",
+    "layer": "2",
+    "version": "1.0.0",
+    "status": "DRAFT",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/SERIE-B/%5BVOL%20II%20-%2007%5D%20COMMUNICATION%20%26%20HONOR%20DOMAIN%20SPECIFICATION%20%28REVISED%20V2.1%29.md",
+    "keywords": ["Communication Ledger", "Honor Registry", "Aura Value Object"],
+    "edges": [
+      { "target": "VOL II-06", "relationType": "Complements" }
+    ]
+  },
+  {
+    "id": "Level D6",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/SERIE-B/LEVEL%20D6%3A%20INFRASTRUCTURE%20%26%20PLATFORM%20ENGINEERING%20HANDBOOK%20%28V2.1.0%29.md",
+    "name": "Infrastructure & Platform Engineering Handbook v2.1",
+    "layer": "3",
+    "version": "2.1.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/SERIE-B/LEVEL%20D6%3A%20INFRASTRUCTURE%20%26%20PLATFORM%20ENGINEERING%20HANDBOOK%20%28V2.1.0%29.md",
+    "keywords": ["Kubernetes", "GitOps (ArgoCD)", "Security", "Observability"],
+    "edges": [
+      { "target": "Level D1", "relationType": "Supports" },
+      { "target": "Level D4", "relationType": "Supports" }
+    ]
+  },
+  {
+    "id": "Level D7",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/SERIE-B/LEVEL%20D7%3A%20SITE%20RELIABILITY%20ENGINEERING%20%28SRE%29%20%26%20PRODUCTION%20OPERATIONS%20HANDBOOK%20%28V2.0.0%29.md",
+    "name": "SRE & Production Operations Handbook",
+    "layer": "3",
+    "version": "1.0.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/SERIE-B/LEVEL%20D7%3A%20SITE%20RELIABILITY%20ENGINEERING%20%28SRE%29%20%26%20PRODUCTION%20OPERATIONS%20HANDBOOK%20%28V2.0.0%29.md",
+    "keywords": ["SRE", "Production Operations", "Monitoring", "Incident Response"],
+    "edges": [
+      { "target": "Level D6", "relationType": "Monitors" }
+    ]
+  },
+  {
+    "id": "Level E",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/SERIE-B/LEVEL%20E%3A%20CANONICAL%20PLATFORM%20ASSET%20REGISTRY%20%26%20EXECUTABLE%20BASELINE%20%28V2.0.0%29.md",
+    "name": "Canonical Platform Asset Registry",
+    "layer": "3",
+    "version": "1.0.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/SERIE-B/LEVEL%20E%3A%20CANONICAL%20PLATFORM%20ASSET%20REGISTRY%20%26%20EXECUTABLE%20BASELINE%20%28V2.0.0%29.md",
+    "keywords": ["Platform Asset", "Registry", "Baseline"],
+    "edges": [
+      { "target": "Level F", "relationType": "FedInto" }
+    ]
+  },
+  {
+    "id": "Level F",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/SERIE-B/LEVEL%20F%3A%20PLATFORM%20COMPOSITION%20%26%20SYSTEM%20ASSEMBLY%20HANDBOOK%20%28V2.0.0%29.md",
+    "name": "Platform Composition & System Assembly Handbook",
+    "layer": "3",
+    "version": "1.0.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/SERIE-B/LEVEL%20F%3A%20PLATFORM%20COMPOSITION%20%26%20SYSTEM%20ASSEMBLY%20HANDBOOK%20%28V2.0.0%29.md",
+    "keywords": ["Platform Composition", "System Assembly"],
+    "edges": [
+      { "target": "Level E", "relationType": "Composes" },
+      { "target": "Level D6", "relationType": "DeployedOn" }
+    ]
+  },
+  {
+    "id": "CORE-000",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/KOS/CORE-000.md",
+    "name": "Vision & Problem Statement",
+    "layer": "4",
+    "version": "1.0.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/KOS/CORE-000.md",
+    "keywords": ["Mission", "Problem Statement", "Knowledge Operating System"],
+    "edges": [
+      { "target": "EDA", "relationType": "Initiates" }
+    ]
+  },
+  {
+    "id": "CORE-001",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/KOS/CORE-001.md",
+    "name": "Core Principles",
+    "layer": "4",
+    "version": "1.0.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/KOS/CORE-001.md",
+    "keywords": ["21 Principles", "Architectural Invariants", "Human Authority"],
+    "edges": [
+      { "target": "CORE-007", "relationType": "Governs" }
+    ]
+  },
+  {
+    "id": "CORE-002",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/KOS/CORE-002.md",
+    "name": "Enterprise Knowledge Identification Standard (EKIS)",
+    "layer": "4",
+    "version": "1.0.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/KOS/CORE-002.md",
+    "keywords": ["Canonical Identity", "Immutability", "Traceability"],
+    "edges": [
+      { "target": "EDA", "relationType": "Refines" },
+      { "target": "EADC", "relationType": "Enforces" },
+      { "target": "KINV-001", "relationType": "PrerequisiteFor" }
+    ]
+  },
+  {
+    "id": "CORE-003",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/KOS/CORE-003.md",
+    "name": "Knowledge Object Model (KOM)",
+    "layer": "4",
+    "version": "1.0.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/KOS/CORE-003.md",
+    "keywords": ["Knowledge Object", "Atomicity", "Semantic Completeness"],
+    "edges": [
+      { "target": "CORE-002", "relationType": "IdentifiedBy" },
+      { "target": "CORE-004", "relationType": "NodeOf" }
+    ]
+  },
+  {
+    "id": "CORE-004",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/KOS/CORE-004.md",
+    "name": "Knowledge Graph Model (KGM)",
+    "layer": "4",
+    "version": "1.0.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/KOS/CORE-004.md",
+    "keywords": ["Knowledge Graph", "Relationship, Neighborhood"],
+    "edges": [
+      { "target": "CORE-003", "relationType": "Aggregates" },
+      { "target": "CORE-005", "relationType": "ContextSource" }
+    ]
+  },
+  {
+    "id": "CORE-005",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/KOS/CORE-005.md",
+    "name": "Context Assembly Specification (CAS)",
+    "layer": "4",
+    "version": "1.0.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/KOS/CORE-005.md",
+    "keywords": ["Working Context", "Context Assembly", "Context Contract"],
+    "edges": [
+      { "target": "CORE-002", "relationType": "References" },
+      { "target": "CORE-003", "relationType": "References" },
+      { "target": "CORE-004", "relationType": "References" },
+      { "target": "VOL I-03", "relationType": "Contextualizes" }
+    ]
+  },
+  {
+    "id": "CORE-006",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/KOS/CORE-006.md",
+    "name": "AI Collaboration Protocol (ACP)",
+    "layer": "4",
+    "version": "1.0.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/KOS/CORE-006.md",
+    "keywords": ["Human Authority", "Context Fidelity", "AI Output Validation"],
+    "edges": [
+      { "target": "CORE-005", "relationType": "Consumes" },
+      { "target": "Handbook", "relationType": "ExecutedBy" }
+    ]
+  },
+  {
+    "id": "CORE-007",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/KOS/CORE-007.md",
+    "name": "Knowledge Operating System Architecture (KOSA)",
+    "layer": "4",
+    "version": "1.0.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/KOS/CORE-007.md",
+    "keywords": ["Architecture Integration", "Layer Stack", "Invariants"],
+    "edges": [
+      { "target": "CORE-000", "relationType": "Integrates" },
+      { "target": "CORE-006", "relationType": "Integrates" }
+    ]
+  },
+  {
+    "id": "KCAT-001",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/KOS/KCAT-001.md",
+    "name": "Knowledge Catalog Specification",
+    "layer": "4",
+    "version": "1.0.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/KOS/KCAT-001.md",
+    "keywords": ["Knowledge Object Record", "Catalog Views", "Query Model"],
+    "edges": [
+      { "target": "KINV-001", "relationType": "Complements" },
+      { "target": "CORE-005", "relationType": "QueriedVia" }
+    ]
+  },
+  {
+    "id": "KINV-001",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/KOS/KINV-001.md",
+    "name": "Knowledge Inventory Specification",
+    "layer": "4",
+    "version": "1.0.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/KOS/KINV-001.md",
+    "keywords": ["Inventory Process", "Object Boundary", "Deep Reference"],
+    "edges": [
+      { "target": "KCAT-001", "relationType": "Populates" }
+    ]
+  },
+  {
+    "id": "KSIP-001",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/KOS/KSIP_v1.0_EXECUTION_BASELINE.md",
+    "name": "Knowledge Source Inventory Plan",
+    "layer": "4",
+    "version": "1.0.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/KOS/KSIP_v1.0_EXECUTION_BASELINE.md",
+    "keywords": ["Execution Order", "Inventory Phase", "Pilot"],
+    "edges": [
+      { "target": "PIP-001", "relationType": "Orchestrates" },
+      { "target": "KINV-001", "relationType": "Implements" }
+    ]
+  },
+  {
+    "id": "PIP-001",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/KOS/PIP_v1.0_EXECUTION_BASELINE.md",
+    "name": "Pilot Inventory Plan",
+    "layer": "4",
+    "version": "1.0.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/KOS/PIP_v1.0_EXECUTION_BASELINE.md",
+    "keywords": ["Pilot Scope", "Success Criteria", "Repeatability"],
+    "edges": [
+      { "target": "KSIP-001", "relationType": "SubPlanOf" },
+      { "target": "FPS-001", "relationType": "DefinesScope" }
+    ]
+  },
+  {
+    "id": "PIR-001",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/KOS/PIR_v1.0_TEMPLATE_BASELINE.md",
+    "name": "Pilot Inventory Report",
+    "layer": "4",
+    "version": "1.0.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/KOS/PIR_v1.0_TEMPLATE_BASELINE.md",
+    "keywords": ["Inventory Results", "Metrics", "Issues", "Recommendations"],
+    "edges": [
+      { "target": "PIP-001", "relationType": "Closes" },
+      { "target": "KCR-001", "relationType": "EvaluatedBy" }
+    ]
+  },
+  {
+    "id": "KCR-001",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/KOS/KCR_v1.0_EXECUTION_BASELINE.md",
+    "name": "Knowledge Conformance Review",
+    "layer": "4",
+    "version": "1.0.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/KOS/KCR_v1.0_EXECUTION_BASELINE.md",
+    "keywords": ["Conformance Assessment", "Decision Framework"],
+    "edges": [
+      { "target": "PIR-001", "relationType": "Reviews" }
+    ]
+  },
+  {
+    "id": "FPS-001",
+    "uri": "https://github.com/QuangAGS/CM-Docs/blob/main/docs/KOS/FPS-001_PILOT_SCOPE_SPECIFICATION.md",
+    "name": "Frozen Pilot Scope",
+    "layer": "4",
+    "version": "1.0.0",
+    "status": "FROZEN",
+    "contentUrl": "https://raw.githubusercontent.com/QuangAGS/CM-Docs/main/docs/KOS/FPS-001_PILOT_SCOPE_SPECIFICATION.md",
+    "keywords": ["Frozen Scope", "Scope Boundary", "Verification Method"],
+    "edges": [
+      { "target": "PIP-001", "relationType": "Constrains" }
+    ]
+  }
+]
