@@ -1,0 +1,109 @@
+<mxfile host="app.diagrams.net" agent="EGAL-OPD">
+  <diagram id="member-join" name="2-Member_Join-Swimlane">
+    <mxGraphModel dx="637" dy="448" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontStyle=1;fontSize=13;" value="OPD Diagram 2 — MEMBER_JOIN (xin vào dòng họ đã có)&#xa;Note toàn cục: Correlation-Id mọi HTTP · Register: Turnstile+rate · Sau login: verifyToken · Duyệt: checkRole + tenantStatusHeavy" vertex="1">
+          <mxGeometry height="50" width="900" x="40" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="lane-user" parent="1" style="swimlane;horizontal=0;startSize=48;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=11;whiteSpace=wrap;" value="Ứng viên&#xa;(Applicant)" vertex="1">
+          <mxGeometry height="200" width="1480" x="40" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="u-start" parent="lane-user" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=11;" value="Start" vertex="1">
+          <mxGeometry height="50" width="70" x="60" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="u-reg" parent="lane-user" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;fontStyle=1;" value="Register&#xa;MEMBER_JOIN&#xa;+ Turnstile&#xa;user=CHO_DUYET" vertex="1">
+          <mxGeometry height="90" width="130" x="160" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="u-wait" parent="lane-user" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" value="Chờ duyệt&#xa;(case SUBMITTED /&#xa;UNDER_REVIEW)" vertex="1">
+          <mxGeometry height="80" width="120" x="330" y="55" as="geometry" />
+        </mxCell>
+        <mxCell id="u-ok" parent="lane-user" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;fontStyle=1;" value="Sau approve&#xa;user=DA_DUYET&#xa;member=DU_BI" vertex="1">
+          <mxGeometry height="80" width="130" x="520" y="55" as="geometry" />
+        </mxCell>
+        <mxCell id="u-profile" parent="lane-user" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" value="Hoàn thiện&#xa;profile /&#xa;onboarding" vertex="1">
+          <mxGeometry height="80" width="120" x="690" y="55" as="geometry" />
+        </mxCell>
+        <mxCell id="u-full" parent="lane-user" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;fontStyle=1;" value="member&#xa;CHINH_THUC&#xa;(khi đủ TT)" vertex="1">
+          <mxGeometry height="80" width="110" x="850" y="55" as="geometry" />
+        </mxCell>
+        <mxCell id="u-end" parent="lane-user" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" value="End OK" vertex="1">
+          <mxGeometry height="50" width="70" x="1000" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ue1" edge="1" parent="lane-user" source="u-start" style="edgeStyle=orthogonalEdgeStyle;html=1;" target="u-reg">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ue2" edge="1" parent="lane-user" source="u-reg" style="edgeStyle=orthogonalEdgeStyle;html=1;" target="u-wait">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ue3" edge="1" parent="lane-user" source="u-wait" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;" target="u-ok">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ue4" edge="1" parent="lane-user" source="u-ok" style="edgeStyle=orthogonalEdgeStyle;html=1;" target="u-profile">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ue5" edge="1" parent="lane-user" source="u-profile" style="edgeStyle=orthogonalEdgeStyle;html=1;" target="u-full">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ue6" edge="1" parent="lane-user" source="u-full" style="edgeStyle=orthogonalEdgeStyle;html=1;" target="u-end">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lane-admin" parent="1" style="swimlane;horizontal=0;startSize=48;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;fontSize=11;whiteSpace=wrap;" value="CLAN_ADMIN&#xa;(tenant HOAT_DONG)" vertex="1">
+          <mxGeometry height="180" width="1480" x="40" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="a-dash" parent="lane-admin" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;fontStyle=1;" value="Dashboard&#xa;query-reviewable&#xa;SEC: Heavy gate" vertex="1">
+          <mxGeometry height="80" width="140" x="200" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="a-appr" parent="lane-admin" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;fontStyle=1;" value="Approve&#xa;→ notif PENDING&#xa;→ DA_DUYET + DU_BI" vertex="1">
+          <mxGeometry height="90" width="150" x="420" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="a-rej" parent="lane-admin" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;fontStyle=1;" value="Reject&#xa;→ notif PENDING&#xa;→ TU_CHOI / REJECTED" vertex="1">
+          <mxGeometry height="90" width="150" x="620" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="a-rev" parent="lane-admin" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4d6;strokeColor=#e69138;fontSize=10;" value="NEEDS_REVISION&#xa;yêu cầu sửa" vertex="1">
+          <mxGeometry height="80" width="130" x="820" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ae1" edge="1" parent="lane-admin" source="a-dash" style="edgeStyle=orthogonalEdgeStyle;html=1;" target="a-appr">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ae2" edge="1" parent="lane-admin" source="a-dash" style="edgeStyle=orthogonalEdgeStyle;html=1;" target="a-rej">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="380.04" y="90" />
+              <mxPoint x="380.04" y="150" />
+              <mxPoint x="695" y="150" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ae3" edge="1" parent="lane-admin" source="a-dash" style="edgeStyle=orthogonalEdgeStyle;html=1;" target="a-rev">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="380.04" y="90" />
+              <mxPoint x="380.04" y="160" />
+              <mxPoint x="885" y="160" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lane-sys" parent="1" style="swimlane;horizontal=0;startSize=48;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=11;whiteSpace=wrap;" value="Hệ thống&#xa;(Job / Worker)" vertex="1">
+          <mxGeometry height="160" width="1480" x="40" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="s-exp" parent="lane-sys" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;fontStyle=1;" value="Job onboardingExpire&#xa;whitelist + 30d&#xa;→ EXPIRED&#xa;+ notif PENDING&#xa;+ BPL ONBOARDING_EXPIRED" vertex="1">
+          <mxGeometry height="100" width="200" x="200" y="35" as="geometry" />
+        </mxCell>
+        <mxCell id="s-worker" parent="lane-sys" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;fontStyle=1;" value="Notif worker&#xa;SKIP LOCKED&#xa;SENT / FAILED&#xa;(max 3 attempts)" vertex="1">
+          <mxGeometry height="90" width="160" x="480" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="s-note" parent="lane-sys" style="shape=note;size=12;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;align=left;" value="Approve/Reject/Expire đều INSERT notifications PENDING trong TX nghiệp vụ (outbox-lite W4)" vertex="1">
+          <mxGeometry height="90" width="280" x="720" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="se1" edge="1" parent="lane-sys" source="s-exp" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;" target="s-worker">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cross" parent="1" style="shape=note;size=14;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;align=left;" value="Nét đứt Ứng viên: chờ CLAN_ADMIN Approve (lane giữa) mới chuyển DA_DUYET + DU_BI.&#xa;Nếu tenant TAM_NGUNG → Heavy chặn query-reviewable / approve (TENANT_NOT_ACTIVATED)." vertex="1">
+          <mxGeometry height="70" width="520" x="40" y="680" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
