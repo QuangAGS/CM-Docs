@@ -1,0 +1,584 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>10-Aug-2026 Register Process Closure Report (RP + OP-2)</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="handover-—-register-process-closure-report-rp--op-2">HandOver — Register Process Closure Report (RP + OP-2)</h1>
+<p><strong>PATH</strong>       : Doctrines docs/Onboarding/HandOver-Register-Process-Closure-2026-08-10.md<br>
+<strong>DATETIME</strong>   : 2026-08-10T14:15:00+07:00<br>
+<strong>VERSION</strong>    : 1.0.0<br>
+<strong>STATUS</strong>     : <strong>CLOSED</strong> — Register Process (RP) + Tenant Activate (OP-2)<br>
+<strong>SSOT</strong>       : SEC / CED / OPD · OP-Boundary-Definition-SSOT-2026-08-09 · Q1/Q2</p>
+<p><strong>REPOS:</strong></p>
+<ul>
+<li>Code: <a href="https://github.com/QuangAGS/cmcodes/tree/main/">https://github.com/QuangAGS/cmcodes/tree/main/</a></li>
+<li>Docs: <a href="https://github.com/QuangAGS/CM-Docs/tree/main/">https://github.com/QuangAGS/CM-Docs/tree/main/</a></li>
+</ul>
+<p><strong>Related (không lặp chi tiết):</strong></p>
+<ul>
+<li><code>HandOver-Register-OP-Package-2026-08-09.md</code> (baseline RP trước OP-2)</li>
+<li><code>OP-Boundary-Definition-SSOT-2026-08-09.md</code></li>
+<li><code>Handoff-PR-OP-4-R1-R2.md</code></li>
+<li><code>Handoff-PR-OP-4-Residual-SEC-1.1-2.x.md</code></li>
+</ul>
+<hr>
+<h2 id="mục-tiêu-đóng-gói">1. Mục tiêu đóng gói</h2>
+<p>Báo cáo tổng thể <strong>Register Process (RP)</strong> từ khởi tạo đến thời điểm hiện tại, bao gồm:</p>
+<ol>
+<li>Phạm vi đã hoàn thành (RP core + residual + OP-2 Tenant Activate).</li>
+<li>Bản đồ trạng thái cuối cùng (users / cases / tenants).</li>
+<li>Đánh giá rủi ro bảo mật (Security Residual).</li>
+<li>Invariants bắt buộc khi mở thread tiếp theo.</li>
+<li>Việc <strong>không</strong> mở lại trừ regression có log + repro.</li>
+</ol>
+<hr>
+<h2 id="phạm-vi-đã-đóng">2. Phạm vi đã đóng</h2>
+<h3 id="register-process-core-uat-ok-—-không-mở-lại">2.1 Register Process core (UAT OK — không mở lại)</h3>
+
+<table>
+<thead>
+<tr>
+<th>Wave</th>
+<th>Nội dung</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PR-OP-1a</td>
+<td>Register → Waiting; không JWT full; login CHO_DUYET → 423</td>
+<td><strong>Closed</strong></td>
+</tr>
+<tr>
+<td>PR-OP-1a.1 M1</td>
+<td>post-TX: case SUBMITTED, BPL, audit, notif; MEMBER_JOIN / CLAN_SETUP</td>
+<td><strong>Closed</strong></td>
+</tr>
+<tr>
+<td>PR-OP-1b</td>
+<td><code>processUserApproval</code>: correlation, Member DU_BI, tenant CHO_DUYET→TAM_NGUNG, authz</td>
+<td><strong>Closed</strong></td>
+</tr>
+<tr>
+<td>PR-OP-4 R1</td>
+<td>Return-for-revision; FE note + prefill; revision submit</td>
+<td><strong>Closed</strong></td>
+</tr>
+<tr>
+<td>PR-OP-4 R2</td>
+<td>Reopen; final rejection; badge/label; form disable final</td>
+<td><strong>Closed</strong></td>
+</tr>
+<tr>
+<td>PR-OP-4 C1/C2</td>
+<td>CreateClan revision parity</td>
+<td><strong>Closed</strong></td>
+</tr>
+<tr>
+<td>Residual 1.1</td>
+<td>Login lock theo account (phone↔email)</td>
+<td><strong>Closed</strong></td>
+</tr>
+<tr>
+<td>Residual 2.1</td>
+<td>Online uniqueness phone/email fail-closed</td>
+<td><strong>Closed</strong></td>
+</tr>
+<tr>
+<td>Residual 2.2</td>
+<td>Revision cập nhật <code>tenants.description</code></td>
+<td><strong>Closed</strong></td>
+</tr>
+<tr>
+<td>Residual 2.3</td>
+<td>Email field UI</td>
+<td><strong>Closed</strong></td>
+</tr>
+</tbody>
+</table><h3 id="op-2-—-tenant-activate-2026-08-09-→-2026-08-10">2.2 OP-2 — Tenant Activate (2026-08-09 → 2026-08-10)</h3>
+
+<table>
+<thead>
+<tr>
+<th>Hạng mục</th>
+<th>Chi tiết</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Schema</td>
+<td><code>business_process_type.TENANT_ACTIVATE</code></td>
+<td><strong>Done</strong></td>
+</tr>
+<tr>
+<td>Error codes</td>
+<td><code>TENANT_ALREADY_ACTIVE</code>, <code>TENANT_NOT_ACTIVATABLE</code> + httpMap 409</td>
+<td><strong>Done</strong></td>
+</tr>
+<tr>
+<td>Service</td>
+<td><code>tenant.service.js</code> → <code>activateTenant</code> (TX: correlation + status + BPL + audit)</td>
+<td><strong>Done</strong></td>
+</tr>
+<tr>
+<td>API</td>
+<td><code>POST /api/tenants/:id/activate</code></td>
+<td><strong>Done</strong></td>
+</tr>
+<tr>
+<td>Authz</td>
+<td>CLAN_ADMIN (own tenant + DA_DUYET) · SYSTEM_ADMIN (full)</td>
+<td><strong>Done</strong></td>
+</tr>
+<tr>
+<td>FE Work Selector</td>
+<td><code>/admin</code> — config-driven; SYSTEM_ADMIN list TAM_NGUNG; CLAN_ADMIN theo status</td>
+<td><strong>Done</strong></td>
+</tr>
+<tr>
+<td>FE Activate</td>
+<td><code>/admin/tenant/activate</code> — trang xác nhận (name + description)</td>
+<td><strong>Done</strong></td>
+</tr>
+<tr>
+<td>Post-success</td>
+<td><strong>Bắt buộc logout → re-login</strong> (JWT mới mang HOAT_DONG)</td>
+<td><strong>Done</strong></td>
+</tr>
+<tr>
+<td>BPL schema</td>
+<td><code>BusinessLogSchemas.TENANT_ACTIVATE</code></td>
+<td><strong>Done</strong></td>
+</tr>
+</tbody>
+</table><p><strong>Smoke đã pass:</strong></p>
+<ul>
+<li>CLAN_ADMIN: activate → auto logout → login lại → Work Selector hiện Phê duyệt.</li>
+<li>SYSTEM_ADMIN: list chỉ TAM_NGUNG → xác nhận → activate → logout.</li>
+<li>Activate lần 2 → 409 <code>TENANT_ALREADY_ACTIVE</code>.</li>
+</ul>
+<hr>
+<h2 id="bản-đồ-trạng-thái-cuối-ssot-vận-hành">3. Bản đồ trạng thái cuối (SSOT vận hành)</h2>
+<h3 id="users.status-auth-gate">3.1 users.status (auth gate)</h3>
+
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Ý nghĩa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CHO_DUYET</code></td>
+<td>Hồ sơ mở / đang revision</td>
+</tr>
+<tr>
+<td><code>DA_DUYET</code></td>
+<td>Đã duyệt — cổng vào hệ thống</td>
+</tr>
+<tr>
+<td><code>TU_CHOI</code></td>
+<td>Từ chối (± final)</td>
+</tr>
+<tr>
+<td><code>BI_KHOA</code> / <code>BI_CAM</code></td>
+<td>An ninh — ngoài vòng Register thường</td>
+</tr>
+</tbody>
+</table><h3 id="onboarding_cases">3.2 onboarding_cases</h3>
+
+<table>
+<thead>
+<tr>
+<th>Status tiêu biểu</th>
+<th>Khi nào</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SUBMITTED</code></td>
+<td>Sau register / sau revision</td>
+</tr>
+<tr>
+<td><code>NEEDS_REVISION</code></td>
+<td>Admin trả về sửa hoặc reopen</td>
+</tr>
+<tr>
+<td><code>APPROVED</code> / <code>REJECTED</code></td>
+<td>Đóng case</td>
+</tr>
+</tbody>
+</table><h3 id="tenants.status-clan_setup-—-đã-cập-nhật-op-2">3.3 tenants.status (CLAN_SETUP) — <strong>đã cập nhật OP-2</strong></h3>
+
+<table>
+<thead>
+<tr>
+<th>Sự kiện</th>
+<th>Tenant status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CreateClan register</td>
+<td><code>CHO_DUYET</code></td>
+</tr>
+<tr>
+<td>SYSTEM approve CLAN_ADMIN</td>
+<td><code>TAM_NGUNG</code></td>
+</tr>
+<tr>
+<td>Reject / final reject</td>
+<td><code>TU_CHOI</code></td>
+</tr>
+<tr>
+<td>Reopen</td>
+<td><code>TU_CHOI</code> → <code>CHO_DUYET</code></td>
+</tr>
+<tr>
+<td><strong>OP-2 Activate</strong></td>
+<td><strong><code>TAM_NGUNG</code> → <code>HOAT_DONG</code></strong></td>
+</tr>
+<tr>
+<td>System tenant (SYSTEM_ADMIN)</td>
+<td><code>NGUNG_HAN</code> (không activate)</td>
+</tr>
+</tbody>
+</table><h3 id="definition-of-done-theo-case-type-tham-chiếu-boundary-ssot">3.4 Definition of Done theo case type (tham chiếu Boundary SSOT)</h3>
+
+<table>
+<thead>
+<tr>
+<th>Case type</th>
+<th>DoD (OP đầy đủ)</th>
+<th>RP+OP-2 đã đạt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CLAN_SETUP</strong></td>
+<td>Tenant <code>HOAT_DONG</code> + founder role đúng</td>
+<td><strong>Tenant HOAT_DONG: đạt</strong> · Profile/member CHINH_THUC: residual OP</td>
+</tr>
+<tr>
+<td><strong>MEMBER_JOIN</strong></td>
+<td>Member <code>CHINH_THUC</code> + case <code>MERGED</code></td>
+<td>RP đóng ở APPROVED + Member DU_BI · Merge/CHINH_THUC: residual OP</td>
+</tr>
+</tbody>
+</table><hr>
+<h2 id="kiến-trúc-fe-admin-sau-op-2">4. Kiến trúc FE Admin sau OP-2</h2>
+
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Vai trò</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/admin</code></td>
+<td>Work Selector (SYSTEM_ADMIN / CLAN_ADMIN)</td>
+</tr>
+<tr>
+<td><code>/admin/tenant/activate</code></td>
+<td>Xác nhận kích hoạt (+ <code>?tenantId=</code> cho SYSTEM_ADMIN)</td>
+</tr>
+<tr>
+<td><code>/admin/approval</code></td>
+<td>Phê duyệt thành viên (yêu cầu tenant HOAT_DONG với CLAN_ADMIN)</td>
+</tr>
+</tbody>
+</table><p><strong>Config mở rộng:</strong><br>
+<code>frontend/src/features/admin/constants/adminWorkItems.js</code><br>
+→ thêm công việc mới chỉ cần thêm object (<code>when</code> theo <code>tenantStatus</code>).</p>
+<p><strong>Câu chào:</strong> <code>phone → email → name</code>.<br>
+<strong>Đăng xuất:</strong> 2 vị trí (dưới chào + cuối trang).</p>
+<hr>
+<h2 id="security-residual--risk-assessment">5. Security Residual &amp; Risk Assessment</h2>
+<h3 id="rủi-ro-đã-kiểm-soát-trong-rp--op-2">5.1 Rủi ro đã kiểm soát trong RP + OP-2</h3>
+
+<table>
+<thead>
+<tr>
+<th>Rủi ro</th>
+<th>Kiểm soát hiện có</th>
+<th>Mức còn lại</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Spam Register (bot Clan_join / Clan_setup)</td>
+<td>Turnstile + rate limit + honeypot + Approval queue thủ công</td>
+<td><strong>Residual vận hành</strong></td>
+</tr>
+<tr>
+<td>CLAN_ADMIN activate tenant người khác</td>
+<td>Service: <code>actor.tenantId === tenantId</code> + DA_DUYET</td>
+<td>Thấp</td>
+</tr>
+<tr>
+<td>MEMBER gọi activate</td>
+<td><code>checkRole</code> + service authz</td>
+<td>Thấp</td>
+</tr>
+<tr>
+<td>Activate khi không TAM_NGUNG</td>
+<td>409 ALREADY_ACTIVE / NOT_ACTIVATABLE</td>
+<td>Thấp</td>
+</tr>
+<tr>
+<td>JWT cũ sau activate</td>
+<td>Force logout bắt buộc</td>
+<td>Thấp</td>
+</tr>
+<tr>
+<td><code>GET /tenants</code> lộ cho non-SYSTEM</td>
+<td>Route <code>checkRole(['SYSTEM_ADMIN'])</code></td>
+<td>Thấp</td>
+</tr>
+<tr>
+<td>Final reject bị reopen</td>
+<td><code>is_final_rejection</code> block</td>
+<td>Thấp</td>
+</tr>
+<tr>
+<td>Self-approve</td>
+<td>Authz cấm</td>
+<td>Thấp</td>
+</tr>
+</tbody>
+</table><h3 id="residual-cần-theo-dõi-không-chặn-đóng-gói">5.2 Residual cần theo dõi (không chặn đóng gói)</h3>
+
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Residual</th>
+<th>Mức</th>
+<th>Hướng xử lý đề xuất</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SEC-R1</strong></td>
+<td>Bot tạo nhiều hồ sơ CHO_DUYET (chi phí duyệt / DB)</td>
+<td>TB</td>
+<td>Rate limit chặt hơn theo IP+identifier; alert ngưỡng; <strong>không</strong> mở lại logic Register</td>
+</tr>
+<tr>
+<td><strong>SEC-R2</strong></td>
+<td>SYSTEM_ADMIN account hardening (credential, session, 2FA)</td>
+<td>Cao (hệ thống)</td>
+<td>Backlog bảo mật riêng — ngoài RP</td>
+</tr>
+<tr>
+<td><strong>SEC-R3</strong></td>
+<td>Production: Turnstile + rate limit phải bật trên domain thật</td>
+<td>TB</td>
+<td>Checklist deploy</td>
+</tr>
+<tr>
+<td><strong>SEC-R4</strong></td>
+<td>Quan sát số CreateClan/JoinClan theo IP</td>
+<td>Thấp–TB</td>
+<td>Log/alert — phase observability</td>
+</tr>
+<tr>
+<td><strong>SEC-R5</strong></td>
+<td>Activate ≠ Member CHINH_THUC / profile hoàn thiện</td>
+<td>TB (nghiệp vụ)</td>
+<td>Thuộc OP post-approval — không nhầm vào RP</td>
+</tr>
+</tbody>
+</table><h3 id="smoke-bảo-mật-tối-thiểu-đãcần-xác-nhận-production">5.3 Smoke bảo mật tối thiểu (đã/cần xác nhận production)</h3>
+<ul>
+<li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" checked="true" disabled=""> CLAN_ADMIN không activate tenant khác → 403</li>
+<li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" checked="true" disabled=""> Activate lần 2 → 409</li>
+<li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" checked="true" disabled=""> Sau activate bắt buộc re-login; JWT mới <code>HOAT_DONG</code></li>
+<li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" checked="true" disabled=""> Work Selector SYSTEM_ADMIN chỉ thấy TAM_NGUNG</li>
+<li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled=""> Production: Turnstile + register rate limit bật (checklist deploy)</li>
+<li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled=""> Production: SYSTEM_ADMIN credential không dùng default init (checklist deploy)</li>
+</ul>
+<hr>
+<h2 id="path--symbol-ssot-code-tham-chiếu-nhanh">6. Path / symbol SSOT code (tham chiếu nhanh)</h2>
+<h3 id="backend">Backend</h3>
+
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Register / Approval / Revision</td>
+<td><code>Backend/src/modules/auth/auth.service.js</code></td>
+</tr>
+<tr>
+<td>Auth routes</td>
+<td><code>Backend/src/modules/auth/auth.routes.js</code></td>
+</tr>
+<tr>
+<td><strong>activateTenant</strong></td>
+<td><code>Backend/src/modules/tenants/tenant.service.js</code></td>
+</tr>
+<tr>
+<td>Tenant routes + activate</td>
+<td><code>Backend/src/modules/tenants/tenant.routes.js</code></td>
+</tr>
+<tr>
+<td>Tenant error codes</td>
+<td><code>Backend/src/shared/errors/codes/tenant.codes.js</code></td>
+</tr>
+<tr>
+<td>httpMap</td>
+<td><code>Backend/src/shared/errors/httpMap.js</code></td>
+</tr>
+<tr>
+<td>BPL schema TENANT_ACTIVATE</td>
+<td><code>Backend/src/services/businessLogSchemas.js</code></td>
+</tr>
+<tr>
+<td>tenantStatus middleware</td>
+<td><code>Backend/src/middlewares/tenantStatus.middleware.js</code></td>
+</tr>
+</tbody>
+</table><h3 id="frontend">Frontend</h3>
+
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Work Selector</td>
+<td><code>frontend/src/pages/AdminWorkSelectorPage.jsx</code></td>
+</tr>
+<tr>
+<td>Activate confirm</td>
+<td><code>frontend/src/pages/AdminTenantActivatePage.jsx</code></td>
+</tr>
+<tr>
+<td>Work items config</td>
+<td><code>frontend/src/features/admin/constants/adminWorkItems.js</code></td>
+</tr>
+<tr>
+<td>Auth redirect</td>
+<td><code>frontend/src/context/AuthContext.jsx</code></td>
+</tr>
+<tr>
+<td>App routes</td>
+<td><code>frontend/src/App.jsx</code></td>
+</tr>
+<tr>
+<td>Approval</td>
+<td><code>frontend/src/pages/AdminUserApprovalPage.jsx</code></td>
+</tr>
+</tbody>
+</table><hr>
+<h2 id="invariants-q1q2-bắt-buộc-thread-sau">7. Invariants Q1/Q2 (bắt buộc thread sau)</h2>
+<ol>
+<li><strong>Q1:</strong> Không phá flow Register / Approval / Revision / Activate đã UAT.</li>
+<li><strong>Q2:</strong> Header PATH / DATETIME / VERSION / DESCRIPTION trên mọi file mới.</li>
+<li><strong>Không gen bulk code</strong> khi chưa confirm plan.</li>
+<li><strong>Correlation</strong> chỉ qua <code>prisma.correlation.create()</code>.</li>
+<li><strong>DA_DUYET</strong> không flip thường; final reject không reopen qua service thường.</li>
+<li><strong>Tenant Activate</strong> chỉ <code>TAM_NGUNG</code> → <code>HOAT_DONG</code>; sau success bắt buộc re-login.</li>
+<li><strong>Không gộp</strong> Tenant Activate vào <code>PROFILE_COMPLETED</code> (Boundary SSOT).</li>
+<li><strong>Không mở lại</strong> RP / OP-1a→1b→4 / residual 1.1/2.x trừ regression có log + repro.</li>
+</ol>
+<hr>
+<h2 id="việc-còn-lại-ngoài-rp-—-thuộc-op-tiếp-theo">8. Việc còn lại (ngoài RP — thuộc OP tiếp theo)</h2>
+
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Hạng mục</th>
+<th>Phase gợi ý</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OP-3+</td>
+<td>Member <code>DU_BI</code> → <code>CHINH_THUC</code> / hoàn thiện profile</td>
+<td>Post-approval completion</td>
+</tr>
+<tr>
+<td>OP-3+</td>
+<td>Merge cây (MEMBER_JOIN → MERGED)</td>
+<td>Post-approval completion</td>
+</tr>
+<tr>
+<td>—</td>
+<td>State machine FE case-centric</td>
+<td>Sau ổn định HOAT_DONG</td>
+</tr>
+<tr>
+<td>—</td>
+<td>Communication doctrine đầy đủ</td>
+<td>Phase communication</td>
+</tr>
+<tr>
+<td>SEC-R2</td>
+<td>SYSTEM_ADMIN 2FA / credential policy</td>
+<td>Security backlog</td>
+</tr>
+<tr>
+<td>SEC-R1</td>
+<td>Bot register observability + tighter rate limit</td>
+<td>Security / ops residual</td>
+</tr>
+</tbody>
+</table><hr>
+<h2 id="kết-luận-đóng-gói">9. Kết luận đóng gói</h2>
+
+<table>
+<thead>
+<tr>
+<th>Gói</th>
+<th>Kết luận</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Register Process (RP)</strong></td>
+<td><strong>CLOSED</strong> — UAT OK, không mở lại trừ regression</td>
+</tr>
+<tr>
+<td><strong>OP-2 Tenant Activate</strong></td>
+<td><strong>CLOSED</strong> — authz + FE + force re-login đã smoke</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>Không có lỗ hổng chiếm quyền đã biết trong phạm vi RP+OP-2; residual bot spam và SYSTEM_ADMIN hardening ghi nhận theo dõi, <strong>không</strong> chặn đóng gói</td>
+</tr>
+<tr>
+<td><strong>OP tiếp theo</strong></td>
+<td>Bắt đầu từ điểm kết thúc RP+OP-2 theo <code>OP-Boundary-Definition-SSOT-2026-08-09.md</code></td>
+</tr>
+</tbody>
+</table><p><strong>Ngày đóng gói:</strong> 2026-08-10</p>
+<p><strong>Người thực hiện / xác nhận:</strong> QuangAGS · thread OP-2 + RP closure</p>
+<hr>
+<p><em>Hết báo cáo.</em></p>
+<blockquote>
+<p>Written with <a href="https://stackedit.io/">StackEdit</a>.</p>
+</blockquote>
+</div>
+</body>
+
+</html>
