@@ -1,0 +1,427 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>new one</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="register-→-op-handoff-contract">REGISTER → OP HANDOFF CONTRACT</h1>
+<p><strong>SSOT — Gia Phả Số 2026 / MEMBER_PROMOTE (Direction A)</strong></p>
+
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Document ID</td>
+<td>Register-to-OP-Handoff-Contract-2026-08-13</td>
+</tr>
+<tr>
+<td>Version</td>
+<td>1.0.0-FINAL</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>Approved &amp; Frozen for implementation</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>2026-08-13</td>
+</tr>
+<tr>
+<td>Repos</td>
+<td>CM-Docs + cmcodes</td>
+</tr>
+<tr>
+<td>Principles</td>
+<td>SSOT + Q1/Q2</td>
+</tr>
+</tbody>
+</table><p>Tài liệu này là Single Source of Truth cho biên giới và handoff giữa <strong>Register Process (RP)</strong> đã CLOSED và <strong>Onboarding Promote Process (OP / MEMBER_PROMOTE)</strong>. Mọi implementation phải tuân thủ. Không mở lại RP/OP-2 trừ regression có log + repro.</p>
+<p><strong>Đường dẫn đề xuất:</strong> <code>docs/Onboarding/Register-to-OP-Handoff-Contract-2026-08-13.md</code></p>
+<hr>
+<h2 id="phạm-vi--nguyên-tắc">1. Phạm vi &amp; nguyên tắc</h2>
+<h3 id="phạm-vi">1.1 Phạm vi</h3>
+<ul>
+<li><strong>Trong phạm vi:</strong> điều kiện mở OP, ownership process, correlation, quyền A/B/C, storage tạm, idempotent.</li>
+<li><strong>Ngoài phạm vi:</strong> FE Elder Support chi tiết, OpenAPI đầy đủ, model <code>process_instances</code> (chỉ ghi chú dài hạn), refactor toàn bộ RP sang <code>member.service</code>.</li>
+</ul>
+<h3 id="nguyên-tắc-bất-biến">1.2 Nguyên tắc bất biến</h3>
+
+<table>
+<thead>
+<tr>
+<th>Nguyên tắc</th>
+<th>Nội dung</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RP đóng tại APPROVED</td>
+<td>Case Register <code>status = APPROVED</code> là terminal của RP. Không UPDATE case RP sang <code>NEEDS_REVISION</code> / <code>SUBMIT</code> cho OP.</td>
+</tr>
+<tr>
+<td>OP là process mới</td>
+<td>Mỗi lần bắt đầu Promote = process instance mới + <code>correlation_id</code> mới.</td>
+</tr>
+<tr>
+<td>Nhận diện ownership</td>
+<td><code>process_type</code> (logic: <code>MEMBER_PROMOTE</code>) + <code>correlation_id</code> — không chỉ <code>case.status</code>.</td>
+</tr>
+<tr>
+<td>Đầu vào OP</td>
+<td>Outcome domain: <code>members.status = DU_BI</code> (+ user <code>DA_DUYET</code> nếu có user). Không = tiếp tục row case RP.</td>
+</tr>
+<tr>
+<td>NEEDS_REVISION tách chủ</td>
+<td><code>NEEDS_REVISION</code> của RP ≠ <code>NEEDS_REVISION</code> của OP (cùng enum status, khác correlation / process).</td>
+</tr>
+</tbody>
+</table><hr>
+<h2 id="trigger-mở-op-đã-chốt">2. Trigger mở OP (đã chốt)</h2>
+<p><strong>Tiêu chuẩn nghiệp vụ (một câu):</strong></p>
+<blockquote>
+<p>Mỗi khi một <code>members</code> row được tạo với <code>status = DU_BI</code> → mở một OP instance mới (<code>correlation_id</code> mới, row/case OP mới, status khởi tạo = <code>DRAFT</code>).</p>
+</blockquote>
+<p>Không phụ thuộc “có đi hết RP hay không”. RP Approve chỉ là <strong>một</strong> nguồn tạo <code>DU_BI</code>; Admin thêm người thân, member <code>CHINH_THUC</code> tạo gia đình, v.v. dùng <strong>cùng</strong> rule.</p>
+<h3 id="ba-lớp-quyền-a--b--c">2.1 Ba lớp quyền (A / B / C)</h3>
+
+<table>
+<thead>
+<tr>
+<th>Lớp</th>
+<th>Việc</th>
+<th>Ai</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Tạo member DU_BI</strong></td>
+<td>Sinh row <code>members</code></td>
+<td><code>SYSTEM_ADMIN</code>, <code>CLAN_ADMIN</code>; sau này member <code>CHINH_THUC</code> (tạo người thân / nhánh).</td>
+</tr>
+<tr>
+<td><strong>B. Mở OP instance</strong></td>
+<td>Row OP mới + C mới</td>
+<td><strong>Hệ thống auto</strong> mỗi khi (A) thành công; User <code>DA_DUYET</code> / Admin được <strong>khởi tạo hoặc tiếp tục</strong> nếu chưa có instance mở (idempotent).</td>
+</tr>
+<tr>
+<td><strong>C. Vận hành OP</strong></td>
+<td>SAVE_DRAFT / SUBMIT / review / approve</td>
+<td><strong>User gắn member:</strong> tự hoàn thiện BP → SUBMIT. <strong>CLAN_ADMIN / SYSTEM_ADMIN:</strong> hỗ trợ + START_REVIEW / APPROVE / REJECT.</td>
+</tr>
+</tbody>
+</table><h3 id="contextguard-action">2.2 ContextGuard (action)</h3>
+
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>USER (chủ member / user_id case)</th>
+<th>CLAN_ADMIN / SYSTEM_ADMIN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SAVE_DRAFT, SUBMIT, WITHDRAW</td>
+<td>Có (đúng instance của mình)</td>
+<td>Có</td>
+</tr>
+<tr>
+<td>START_REVIEW, RETURN_FOR_REVISION, APPROVE, REJECT</td>
+<td>Không</td>
+<td>Có</td>
+</tr>
+</tbody>
+</table><p>User <code>DA_DUYET</code> khởi tạo/vận hành OP = quyền <strong>B + C (draft/submit)</strong>, không phải quyền APPROVE.</p>
+<p>Sau khi member thành <code>CHINH_THUC</code>, họ có thể tạo thêm member <code>DU_BI</code> (gia đình) → mỗi <code>DU_BI</code> mới auto mở OP riêng.</p>
+<hr>
+<h2 id="handoff-rp-→-op">3. Handoff RP → OP</h2>
+<h3 id="khi-rp-approve-thành-công">3.1 Khi RP Approve thành công</h3>
+<p>Hệ thống phải đảm bảo outcome:</p>
+
+<table>
+<thead>
+<tr>
+<th>Artifact</th>
+<th>Bắt buộc</th>
+<th>Ghi chú</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>users.status</code></td>
+<td><code>DA_DUYET</code></td>
+<td>User đã duyệt</td>
+</tr>
+<tr>
+<td><code>members.status</code></td>
+<td><code>DU_BI</code></td>
+<td>Member sơ bộ đã tạo</td>
+</tr>
+<tr>
+<td>Link user ↔ member</td>
+<td>Có</td>
+<td>Theo quan hệ RP đã UAT</td>
+</tr>
+<tr>
+<td>Case RP <code>onboarding_cases</code></td>
+<td><code>APPROVED</code> (đóng)</td>
+<td>Không bắt buộc <code>primary_member_id</code> trên case RP; OP <strong>không</strong> đọc field đó từ case RP</td>
+</tr>
+<tr>
+<td>RP <code>correlation_id</code></td>
+<td>Giữ lịch sử</td>
+<td>Chỉ để <strong>trace</strong>; OP <strong>không</strong> tái sử dụng</td>
+</tr>
+</tbody>
+</table><h3 id="hành-động-bắt-buộc-sau-approve-implementation-ngắn-hạn">3.2 Hành động bắt buộc sau Approve (implementation ngắn hạn)</h3>
+<pre><code>RP Approve (giữ nguyên luồng đã UAT — Q1)
+  → user DA_DUYET + member DU_BI chắc chắn
+  → openMemberPromoteInstance({ userId, memberId, tenantId, sourceRegisterCaseId? })
+  → row OP mới, status = DRAFT, correlation_id mới, primary_member_id gắn member DU_BI
+</code></pre>
+<ul>
+<li><strong>Không</strong> bắt buộc refactor toàn bộ RP sang <code>member.service</code> trong cùng PR.</li>
+<li><code>openMemberPromoteInstance</code> <strong>chỉ</strong> tạo instance OP — <strong>không</strong> tạo member.</li>
+</ul>
+<h3 id="storage-tạm-onboarding_cases">3.3 Storage tạm (<code>onboarding_cases</code>)</h3>
+<p>Tạo <strong>row mới</strong> với tối thiểu:</p>
+
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Giá trị</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>gen_random_uuid()</code></td>
+</tr>
+<tr>
+<td><code>correlation_id</code></td>
+<td><code>gen_random_uuid()</code> — <strong>MỚI, bắt buộc</strong></td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td><code>DRAFT</code></td>
+</tr>
+<tr>
+<td><code>case_type</code></td>
+<td><code>MEMBER_JOIN</code> | <code>CLAN_SETUP</code> (ngữ cảnh tenant/flow)</td>
+</tr>
+<tr>
+<td><code>user_id</code></td>
+<td>User <code>DA_DUYET</code> (nếu có)</td>
+</tr>
+<tr>
+<td><code>primary_member_id</code></td>
+<td>Member <code>DU_BI</code> — <strong>BẮT BUỘC trên case OP</strong></td>
+</tr>
+<tr>
+<td><code>tenant_id</code></td>
+<td>Tenant liên quan</td>
+</tr>
+<tr>
+<td><code>metadata</code></td>
+<td>Xem dưới</td>
+</tr>
+</tbody>
+</table><pre class=" language-json"><code class="prism  language-json"><span class="token punctuation">{</span>
+  <span class="token string">"process_type"</span><span class="token punctuation">:</span> <span class="token string">"MEMBER_PROMOTE"</span><span class="token punctuation">,</span>
+  <span class="token string">"source"</span><span class="token punctuation">:</span> <span class="token string">"OP"</span><span class="token punctuation">,</span>
+  <span class="token string">"source_register_case_id"</span><span class="token punctuation">:</span> <span class="token string">"&lt;id case RP APPROVED | null&gt;"</span><span class="token punctuation">,</span>
+  <span class="token string">"source_register_correlation_id"</span><span class="token punctuation">:</span> <span class="token string">"&lt;C của RP | null&gt;"</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p><strong>Cấm:</strong> <code>UPDATE</code> case RP <code>APPROVED</code> → <code>NEEDS_REVISION</code> để “giả” OP.<br>
+Fixture SQL dev <strong>không</strong> phải production path.</p>
+<h3 id="state-khởi-tạo-op">3.4 State khởi tạo OP</h3>
+<p><strong>v1:</strong> luôn <strong><code>DRAFT</code></strong> khi auto-open sau create <code>DU_BI</code>.<br>
+<code>SUBMIT</code> do USER / Admin trên instance đó.</p>
+<hr>
+<h2 id="entry-condition--profile-member_promote">4. Entry condition &amp; profile (MEMBER_PROMOTE)</h2>
+<ul>
+<li><code>primary_member_id</code> có và <code>members.status = DU_BI</code></li>
+<li>Nếu có <code>user_id</code> → <code>users.status = DA_DUYET</code> (promote gắn tài khoản)</li>
+<li>Member không user (chỉ trong cây): entry nới theo rule Admin-only (definition)</li>
+<li><strong>Base Profile hard required trước APPROVE:</strong> <code>full_name</code>, <code>gender</code>, <code>is_alive</code>, <code>birth_year</code>, <code>birth_month</code>, <code>birth_day</code></li>
+<li><strong>generation:</strong> bắt buộc ≥ 1 với <code>CLAN_SETUP</code>; strongly recommended (warn) với <code>MEMBER_JOIN</code></li>
+<li><code>father_id</code> / <code>mother_id</code>: optional</li>
+<li><strong>Side-effect APPROVED:</strong> <code>members.status = CHINH_THUC</code>; <strong>không</strong> auto <code>CLAN_ADMIN</code>; <strong>không</strong> auto tenant <code>HOAT_DONG</code></li>
+</ul>
+<hr>
+<h2 id="correlation-bpl-communication">5. Correlation, BPL, Communication</h2>
+
+<table>
+<thead>
+<tr>
+<th>Hạng mục</th>
+<th>Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Root OP instance</td>
+<td><code>onboarding_cases.correlation_id</code> = C mở process</td>
+</tr>
+<tr>
+<td>Mỗi action quan trọng (trừ SAVE_DRAFT)</td>
+<td>Một correlation mới (SRPF); ghi BPL</td>
+</tr>
+<tr>
+<td>Trace về RP</td>
+<td><code>metadata.source_register_*</code> + BPL metadata — không reuse C RP</td>
+</tr>
+<tr>
+<td>Notification <code>event_type</code></td>
+<td>Map <code>MEMBER_PROMOTE_*</code> → enum <code>ONBOARDING_*</code> (<code>ONBOARDING_SUBMITTED</code>, …)</td>
+</tr>
+<tr>
+<td>Communication</td>
+<td>After-commit; <code>silentEmit</code>; failure không phá business TX</td>
+</tr>
+<tr>
+<td><code>audit_logs.action</code></td>
+<td><code>THEM_MOI</code> | <code>CAP_NHAT</code> | <code>XOA</code> (không dùng tên SRPF action)</td>
+</tr>
+<tr>
+<td>audit <code>changed_by</code></td>
+<td>Chỉ UUID <code>users.id</code> hợp lệ (tránh FK abort TX)</td>
+</tr>
+</tbody>
+</table><hr>
+<h2 id="member.service-hướng-dài-hạn-không-chặn-handoff">6. member.service (hướng dài hạn, không chặn handoff)</h2>
+<p><strong>Ngắn hạn:</strong> RP Approve += <code>openMemberPromoteInstance</code>.</p>
+<p><strong>Dài hạn — một cổng <code>createDuBiMember</code>:</strong></p>
+<ol>
+<li>Force <code>members.status = DU_BI</code> (không tạo <code>CHINH_THUC</code> trực tiếp)</li>
+<li>Tenant <code>HOAT_DONG</code> cho luồng thường (JOIN / family)</li>
+<li>Exception: tenant <code>TAM_NGUNG</code> + context <code>CLAN_SETUP</code> founder</li>
+<li>Sau insert member → <code>openMemberPromoteInstance</code> (idempotent)</li>
+</ol>
+<p>RP / Admin / <code>CHINH_THUC</code> dần gọi service này; <strong>không</strong> big-bang refactor RP trong phase handoff.</p>
+<hr>
+<h2 id="idempotent">7. Idempotent</h2>
+<p>Một member <code>DU_BI</code> <strong>tối đa một</strong> OP instance đang mở (status không terminal).<br>
+Retry Approve / tạo trùng <strong>không</strong> nhân đôi case.</p>
+<p><strong>Key gợi ý:</strong></p>
+<pre class=" language-text"><code class="prism  language-text">(tenant_id, primary_member_id, metadata.process_type = MEMBER_PROMOTE,
+ status ∉ { APPROVED, REJECTED, CANCELLED, EXPIRED })
+</code></pre>
+<hr>
+<h2 id="boundary-—-không-làm">8. Boundary — không làm</h2>
+<ul>
+<li>Không reopen case RP <code>APPROVED</code> / <code>REJECTED</code> / <code>CANCELLED</code> cho OP</li>
+<li>Không dùng SQL fixture <code>UPDATE status</code> case RP như production path</li>
+<li>Không auto gán <code>CLAN_ADMIN</code> khi promote</li>
+<li>Không auto <code>tenant.status = HOAT_DONG</code> (CLAN_SETUP: Admin tự quyết)</li>
+<li>Không bắt buộc model <code>process_instances</code> trong phase này (note dài hạn trong Architecture SRPF)</li>
+<li>Không dời engine SRPF sang <code>modules/onboarding</code> ngay; definition + open instance chuyển <strong>sau</strong> lát cắt OP ổn</li>
+</ul>
+<hr>
+<h2 id="vòng-đời-tóm-tắt">9. Vòng đời tóm tắt</h2>
+<pre class=" language-text"><code class="prism  language-text">RP Approve
+  → user DA_DUYET + member DU_BI
+  → auto open OP instance (DRAFT, C mới, primary_member_id)
+  → USER hoàn thiện BP → SUBMIT
+  → Admin START_REVIEW → APPROVE | REJECT | RETURN_FOR_REVISION
+  → APPROVE: member CHINH_THUC
+  → (sau) CHINH_THUC tạo thêm DU_BI → mỗi người một OP mới
+</code></pre>
+<hr>
+<h2 id="deliverable-implementation-thứ-tự">10. Deliverable implementation (thứ tự)</h2>
+
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Việc</th>
+<th>Ghi chú</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>C1</strong></td>
+<td>Document này (SSOT)</td>
+<td>Approved &amp; Frozen v1.0</td>
+</tr>
+<tr>
+<td><strong>C2</strong></td>
+<td><code>openMemberPromoteInstance(...)</code></td>
+<td>Tạo row + C mới; idempotent</td>
+</tr>
+<tr>
+<td><strong>C3</strong></td>
+<td>Gọi từ RP Approve (+ điểm create DU_BI khi sẵn sàng)</td>
+<td>Q1: không phá RP UAT</td>
+</tr>
+<tr>
+<td><strong>C4</strong></td>
+<td>Test: open OP rồi SUBMIT (không reset case RP)</td>
+<td>Thay fixture giả NEEDS_REVISION trên case RP</td>
+</tr>
+<tr>
+<td><strong>C5</strong></td>
+<td>E2E APPROVE → CHINH_THUC</td>
+<td>Khi BP đủ</td>
+</tr>
+<tr>
+<td><strong>C6</strong></td>
+<td>Move definition + open service → <code>modules/onboarding</code></td>
+<td>Sau lát cắt ổn — không làm ngay</td>
+</tr>
+</tbody>
+</table><hr>
+<h2 id="tham-chiếu">11. Tham chiếu</h2>
+<ul>
+<li>Standard-Revision-Process-Framework-SRPF-v1.0-Final (CM-Docs)</li>
+<li>SRPF-Architecture-Overview-Pseudo-code-v1.1</li>
+<li>OP-Boundary-Definition-SSOT-2026-08-09</li>
+<li>HandOver-Register-Process-Closure-2026-08-10 (RP + OP-2 CLOSED)</li>
+<li>Code: <code>src/shared/frameworks/srpf</code> (engine); <code>MemberPromote.definition.js</code></li>
+</ul>
+<hr>
+<h2 id="phê-duyệt">12. Phê duyệt</h2>
+
+<table>
+<thead>
+<tr>
+<th>Hạng mục</th>
+<th>Giá trị</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Status</td>
+<td><strong>Approved &amp; Frozen v1.0.0</strong> — đủ để implementation C2+</td>
+</tr>
+<tr>
+<td>Ngày</td>
+<td>2026-08-13</td>
+</tr>
+<tr>
+<td>Nguyên tắc</td>
+<td>SSOT + Q1 (bảo toàn RP) + Q2 (doc-first)</td>
+</tr>
+<tr>
+<td>Thay đổi sau freeze</td>
+<td>Chỉ qua amendment có version + lý do; không sửa âm thầm</td>
+</tr>
+</tbody>
+</table><hr>
+<p><em>End of Register-to-OP-Handoff-Contract v1.0.0-FINAL</em></p>
+</div>
+</body>
+
+</html>
