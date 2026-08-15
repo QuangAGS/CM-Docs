@@ -1,0 +1,525 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>new one</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="handoff-report-—-c6">HANDOFF REPORT — C6</h1>
+<p><strong>OP Realization Move → <code>modules/onboarding/srpf</code> + Correlation Control Map ©</strong></p>
+
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Document ID</td>
+<td>HandOff-C6-OP-SRPF-Move-Correlation-2026-08-15</td>
+</tr>
+<tr>
+<td>Version</td>
+<td>1.0.0-FINAL</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>Ready to Close</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>2026-08-15</td>
+</tr>
+<tr>
+<td>Repos</td>
+<td>cmcodes + CM-Docs</td>
+</tr>
+<tr>
+<td>Principles</td>
+<td>SSOT + Q1/Q2</td>
+</tr>
+<tr>
+<td>Related</td>
+<td>Register-to-OP-Handoff-Contract-2026-08-13 v1.0</td>
+</tr>
+</tbody>
+</table><p>Báo cáo bàn giao kết thúc <strong>C6</strong>: tách realization <code>MEMBER_PROMOTE</code> (OP) khỏi shared SRPF engine, xác nhận E2E <code>MEMBER_JOIN</code> + <code>CLAN_SETUP</code>, và chuẩn hóa mô hình kiểm soát <strong>correlation_id ©</strong>.</p>
+<p><strong>Đường dẫn đề xuất CM-Docs:</strong><br>
+<code>Doctrines docs/Onboarding/HandOff-C6-OP-SRPF-Move-Correlation-2026-08-15.md</code></p>
+<hr>
+<h2 id="mục-tiêu--phạm-vi-c6">1. Mục tiêu &amp; phạm vi C6</h2>
+<h3 id="mục-tiêu">1.1 Mục tiêu</h3>
+<ul>
+<li>Engine SRPF generic giữ tại <code>shared/frameworks/srpf</code> (không biết <code>MEMBER_PROMOTE</code>).</li>
+<li>Definition + <code>openMemberPromoteInstance</code> + register bootstrap chuyển sang <code>modules/onboarding/srpf</code>.</li>
+<li>Auth C3 (<code>processUserApproval</code>) require path mới; không phá Q1 luồng Approve.</li>
+<li>Test suite C6 tự <code>register</code> trước <code>executeAction</code>.</li>
+</ul>
+<h3 id="phạm-vi">1.2 Phạm vi</h3>
+
+<table>
+<thead>
+<tr>
+<th>Trong phạm vi</th>
+<th>Ngoài phạm vi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Move definition + open service + register</td>
+<td>FE / OpenAPI routes OP</td>
+</tr>
+<tr>
+<td>Barrel <code>index</code> <code>modules/onboarding/srpf</code></td>
+<td>Model <code>process_instances</code></td>
+</tr>
+<tr>
+<td>Wire <code>registerMemberPromote</code> (routes/tests)</td>
+<td>Refactor RP sang <code>member.service</code></td>
+</tr>
+<tr>
+<td>E2E verify JOIN + CLAN_SETUP sau move</td>
+<td>Auto tenant <code>HOAT_DONG</code> / auto <code>CLAN_ADMIN</code></td>
+</tr>
+<tr>
+<td>Correlation control map (SSOT vận hành)</td>
+<td>Đổi schema <code>notification_event</code></td>
+</tr>
+</tbody>
+</table><hr>
+<h2 id="cấu-trúc-sau-c6">2. Cấu trúc sau C6</h2>
+<h3 id="shared-—-engine-only">2.1 Shared — engine only</h3>
+<pre class=" language-text"><code class="prism  language-text">Backend/src/shared/frameworks/srpf/
+  engine/          ActionExecutor, StateMachineRunner, CorrelationFactory
+  guards/          ContextGuard
+  ledger/          BusinessLedgerWriter
+  communication/   CommunicationHook
+  storage/         ProcessInstanceLoader (temp: onboarding_cases)
+  registry/        ProcessDefinitionRegistry
+  constants/       states, actions
+  errors/          srpf.codes, srpfCreateError
+  index.js         v0.8.1-C6 — KHÔNG auto-register MEMBER_PROMOTE
+</code></pre>
+<h3 id="onboarding-—-op-realization">2.2 Onboarding — OP realization</h3>
+<pre class=" language-text"><code class="prism  language-text">Backend/src/modules/onboarding/srpf/
+  index.js                         Barrel v1.0.0-C6
+  registerMemberPromote.js         Idempotent bootstrap register
+  definitions/MemberPromote.definition.js
+  services/openMemberPromoteInstance.js
+</code></pre>
+<h3 id="bootstrap">2.3 Bootstrap</h3>
+<ul>
+<li><code>onboarding.routes.js</code> (hoặc app load routes): <code>require('./srpf').registerMemberPromote()</code></li>
+<li>Test scripts: tự gọi <code>registerMemberPromote()</code> trước <code>executeAction</code></li>
+<li><code>auth.service</code>: <code>require('../onboarding/srpf')</code> hoặc <code>.../services/openMemberPromoteInstance</code></li>
+</ul>
+<hr>
+<h2 id="deliverable-đã-hoàn-thành-c1–c6">3. Deliverable đã hoàn thành (C1–C6)</h2>
+
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Việc</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>C1</strong></td>
+<td>Register-to-OP-Handoff-Contract SSOT v1.0</td>
+<td>DONE</td>
+</tr>
+<tr>
+<td><strong>C2</strong></td>
+<td><code>openMemberPromoteInstance</code> (idempotent, DRAFT, C mới)</td>
+<td>DONE</td>
+</tr>
+<tr>
+<td><strong>C3</strong></td>
+<td><code>processUserApproval</code> DA_DUYET → open OP (cùng TX)</td>
+<td>DONE</td>
+</tr>
+<tr>
+<td><strong>C4</strong></td>
+<td>OP DRAFT → SUBMIT (+ BPL + notif)</td>
+<td>DONE</td>
+</tr>
+<tr>
+<td><strong>C5</strong></td>
+<td>START_REVIEW → APPROVE → member <code>CHINH_THUC</code></td>
+<td>DONE</td>
+</tr>
+<tr>
+<td><strong>C6</strong></td>
+<td>Move realization → <code>modules/onboarding/srpf</code> + barrel + index header</td>
+<td>DONE</td>
+</tr>
+</tbody>
+</table><hr>
+<h2 id="sơ-đồ-kiểm-soát-correlation_id-c">4. Sơ đồ kiểm soát Correlation_id ©</h2>
+<p>Hai lớp C bắt buộc tách khi đọc DB và khi design process:</p>
+
+<table>
+<thead>
+<tr>
+<th>Lớp</th>
+<th>Ý nghĩa</th>
+<th>Lưu ở đâu</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>C-root (case)</strong></td>
+<td>Định danh một process instance / vòng đời hồ sơ</td>
+<td><code>onboarding_cases.correlation_id</code> (unique, <strong>không đổi</strong> theo action)</td>
+</tr>
+<tr>
+<td><strong>C-action</strong></td>
+<td>Định danh một hành động nghiệp vụ (submit, approve…)</td>
+<td><code>business_process_logs</code>, <code>notifications</code>, <code>audit_logs</code></td>
+</tr>
+</tbody>
+</table><p><strong>Quy tắc:</strong></p>
+<ul>
+<li><code>SAVE_DRAFT</code> <strong>không</strong> sinh C.</li>
+<li>Các action SRPF còn lại (<code>SUBMIT</code>, <code>START_REVIEW</code>, <code>APPROVE</code>, …) sinh <strong>C-action mới</strong>.</li>
+<li>C-action <strong>KHÔNG</strong> ghi đè <code>onboarding_cases.correlation_id</code>.</li>
+</ul>
+<h3 id="happy-path-clan_setup-đã-chứng-minh-trên-db">4.1 Happy path CLAN_SETUP (đã chứng minh trên DB)</h3>
+<pre class=" language-text"><code class="prism  language-text">Register CreateClan
+  C1  ──► onboarding_cases RP (CLAN_SETUP)
+      ├── business_process_logs: USER_REGISTER, ONBOARDING_CASE_CREATE
+      ├── notifications: USER_REGISTERED
+      └── audit: REGISTER_CREATE_CLAN (user CHO_DUYET, tenant CHO_DUYET)
+
+processUserApproval → DA_DUYET
+  C_a ──► BPL USER_APPROVAL SUCCESS
+      ├── audit: user CHO_DUYET→DA_DUYET + member_id
+      ├── audit: tenant CHO_DUYET→TAM_NGUNG (CLAN_SETUP)
+      └── (cùng TX) openMemberPromoteInstance
+
+openMemberPromoteInstance
+  C_op ──► onboarding_cases OP MỚI (DRAFT, process_type MEMBER_PROMOTE)
+           metadata.source_register_case_id / source_register_correlation_id = RP/C1
+           (không bắt buộc BPL lúc open — implement hiện tại)
+
+MEMBER_PROMOTE SUBMIT
+  C_s ──► BPL ONBOARDING_SUBMIT + notif ONBOARDING_SUBMITTED + audit case DRAFT→SUBMITTED
+           case OP: status SUBMITTED, correlation_id vẫn = C_op
+
+START_REVIEW
+  C_r ──► BPL ONBOARDING_REVIEW_START + audit → UNDER_REVIEW
+
+APPROVE
+  C_p ──► BPL ONBOARDING_APPROVE + notif ONBOARDING_APPROVED + audit → APPROVED
+           sideEffect: members.status = CHINH_THUC
+</code></pre>
+<h3 id="bảng-ánh-xạ-c-↔-bảng-kiểm-soát-vận-hành">4.2 Bảng ánh xạ C ↔ bảng (kiểm soát vận hành)</h3>
+
+<table>
+<thead>
+<tr>
+<th>Nhãn</th>
+<th>Sinh khi</th>
+<th>onboarding_cases</th>
+<th>BPL</th>
+<th>notifications</th>
+<th>audit_logs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>C1</strong></td>
+<td>Register CreateClan/Join</td>
+<td>YES (root RP)</td>
+<td>YES (USER_REGISTER, CASE_CREATE…)</td>
+<td>YES (USER_REGISTERED…)</td>
+<td>YES (REGISTER_*)</td>
+</tr>
+<tr>
+<td><strong>C2, C3…</strong></td>
+<td>Revision RP (nếu có)</td>
+<td>NO (giữ C1)</td>
+<td>YES (C-action)</td>
+<td>YES (nếu emit)</td>
+<td>YES (nếu có)</td>
+</tr>
+<tr>
+<td><strong>C_a</strong></td>
+<td>processUserApproval</td>
+<td>NO (RP status APPROVED, C1 giữ)</td>
+<td>YES USER_APPROVAL</td>
+<td>YES (post-TX)</td>
+<td>YES user/tenant</td>
+</tr>
+<tr>
+<td><strong>C_op</strong></td>
+<td>openMemberPromoteInstance</td>
+<td>YES (root OP)</td>
+<td>NO (hiện tại)</td>
+<td>NO (hiện tại)</td>
+<td>NO (hiện tại)</td>
+</tr>
+<tr>
+<td><strong>C_s</strong></td>
+<td>OP SUBMIT</td>
+<td>NO (giữ C_op)</td>
+<td>YES ONBOARDING_SUBMIT</td>
+<td>YES ONBOARDING_SUBMITTED</td>
+<td>YES case status</td>
+</tr>
+<tr>
+<td><strong>C_r</strong></td>
+<td>OP START_REVIEW</td>
+<td>NO (giữ C_op)</td>
+<td>YES REVIEW_START</td>
+<td>YES UNDER_REVIEW</td>
+<td>YES</td>
+</tr>
+<tr>
+<td><strong>C_p</strong></td>
+<td>OP APPROVE</td>
+<td>NO (giữ C_op)</td>
+<td>YES ONBOARDING_APPROVE</td>
+<td>YES ONBOARDING_APPROVED</td>
+<td>YES</td>
+</tr>
+<tr>
+<td><strong>C_x</strong></td>
+<td>REJECT / RETURN / CANCEL</td>
+<td>NO (giữ C_op)</td>
+<td>YES tương ứng</td>
+<td>YES tương ứng</td>
+<td>YES</td>
+</tr>
+</tbody>
+</table><h3 id="ví-dụ-số-liệu-thật-clan_setup-—-đỗ-văn-a-2026-08-15">4.3 Ví dụ số liệu thật (CLAN_SETUP — Đỗ Văn A, 2026-08-15)</h3>
+
+<table>
+<thead>
+<tr>
+<th>Nhãn</th>
+<th>correlation_id</th>
+<th>Ghi nhận chính</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>C1</strong></td>
+<td><code>b6cf9e31-60ec-47ca-8e90-55809d462b02</code></td>
+<td>Case RP APPROVED; BPL REGISTER; notif USER_REGISTERED</td>
+</tr>
+<tr>
+<td><strong>C_a</strong></td>
+<td><code>9b0ee839-d4ba-44f7-8f3a-bedc74e629a8</code></td>
+<td>USER_APPROVAL; user DA_DUYET; tenant TAM_NGUNG</td>
+</tr>
+<tr>
+<td><strong>C_op</strong></td>
+<td><code>45ecbe1e-5f00-4e92-9044-a913f45c807b</code></td>
+<td>Case OP <code>7ae88300-…</code> root</td>
+</tr>
+<tr>
+<td><strong>C_s</strong></td>
+<td><code>82d248af-f1d4-4b34-987c-22c257ab183f</code></td>
+<td>ONBOARDING_SUBMIT SUCCESS + notif</td>
+</tr>
+<tr>
+<td><strong>C_r</strong></td>
+<td><code>8700ccf9-be07-4781-bb92-d6d6fea4a5f2</code></td>
+<td>START_REVIEW audit SUBMITTED→UNDER_REVIEW</td>
+</tr>
+<tr>
+<td><strong>C_p</strong></td>
+<td><code>fae70533-4bba-45f2-8cb1-90e10d56c743</code></td>
+<td>APPROVE; member CHINH_THUC (Đỗ Văn A)</td>
+</tr>
+</tbody>
+</table><h3 id="anti-pattern-cấm">4.4 Anti-pattern (cấm)</h3>
+<ul>
+<li><code>UPDATE</code> case RP <code>APPROVED</code> → <code>NEEDS_REVISION</code> để “giả” OP.</li>
+<li>Reuse <strong>C1</strong> hoặc <strong>C_a</strong> làm <code>onboarding_cases.correlation_id</code> của OP.</li>
+<li>Query case bằng <strong>C-action</strong> (<code>C_s</code> / <code>C_p</code>) — sẽ <strong>0 row</strong>; phải query theo <strong>case id</strong> hoặc <strong>C_op</strong>.</li>
+<li>Coi mọi <code>correlation_id</code> trên BPL là root case.</li>
+</ul>
+<h3 id="sql-đối-soát-chuẩn">4.5 SQL đối soát chuẩn</h3>
+<pre class=" language-sql"><code class="prism  language-sql"><span class="token comment">-- Case RP + OP cùng user</span>
+<span class="token keyword">SELECT</span> id<span class="token punctuation">,</span> case_type<span class="token punctuation">,</span> <span class="token keyword">status</span><span class="token punctuation">,</span> correlation_id<span class="token punctuation">,</span> primary_member_id<span class="token punctuation">,</span> metadata
+<span class="token keyword">FROM</span> onboarding_cases
+<span class="token keyword">WHERE</span> user_id <span class="token operator">=</span> <span class="token string">'&lt;userId&gt;'</span>
+<span class="token keyword">ORDER</span> <span class="token keyword">BY</span> created_at<span class="token punctuation">;</span>
+
+<span class="token comment">-- BPL theo các C đã biết</span>
+<span class="token keyword">SELECT</span> correlation_id<span class="token punctuation">,</span> process_type<span class="token punctuation">,</span> process_status<span class="token punctuation">,</span> created_at
+<span class="token keyword">FROM</span> business_process_logs
+<span class="token keyword">WHERE</span> correlation_id <span class="token operator">IN</span> <span class="token punctuation">(</span><span class="token string">'&lt;C1&gt;'</span><span class="token punctuation">,</span><span class="token string">'&lt;C_a&gt;'</span><span class="token punctuation">,</span><span class="token string">'&lt;C_op&gt;'</span><span class="token punctuation">,</span><span class="token string">'&lt;C_s&gt;'</span><span class="token punctuation">,</span><span class="token string">'&lt;C_r&gt;'</span><span class="token punctuation">,</span><span class="token string">'&lt;C_p&gt;'</span><span class="token punctuation">)</span>
+<span class="token keyword">ORDER</span> <span class="token keyword">BY</span> created_at<span class="token punctuation">;</span>
+
+<span class="token comment">-- Notif</span>
+<span class="token keyword">SELECT</span> correlation_id<span class="token punctuation">,</span> event_type<span class="token punctuation">,</span> title
+<span class="token keyword">FROM</span> notifications
+<span class="token keyword">WHERE</span> correlation_id <span class="token operator">IN</span> <span class="token punctuation">(</span><span class="token string">'&lt;C1&gt;'</span><span class="token punctuation">,</span><span class="token string">'&lt;C_a&gt;'</span><span class="token punctuation">,</span><span class="token string">'&lt;C_s&gt;'</span><span class="token punctuation">,</span><span class="token string">'&lt;C_p&gt;'</span><span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">-- C_a nếu chưa có trong list C case</span>
+<span class="token keyword">SELECT</span> correlation_id<span class="token punctuation">,</span> process_type<span class="token punctuation">,</span> process_status<span class="token punctuation">,</span> created_at
+<span class="token keyword">FROM</span> business_process_logs
+<span class="token keyword">WHERE</span> process_type <span class="token operator">=</span> <span class="token string">'USER_APPROVAL'</span>
+  <span class="token operator">AND</span> created_at <span class="token operator">&gt;=</span> <span class="token string">'&lt;register_time&gt;'</span>
+<span class="token keyword">ORDER</span> <span class="token keyword">BY</span> created_at<span class="token punctuation">;</span>
+</code></pre>
+<hr>
+<h2 id="kết-quả-kiểm-thử-sau-c6">5. Kết quả kiểm thử sau C6</h2>
+<h3 id="member_join">5.1 MEMBER_JOIN</h3>
+<ul>
+<li>open → DRAFT → SUBMIT → START_REVIEW → APPROVE → <code>CHINH_THUC</code></li>
+<li>BPL + <code>ONBOARDING_SUBMITTED</code> / <code>ONBOARDING_APPROVED</code></li>
+<li><code>generation</code> JOIN: <strong>warn only</strong> (strongly recommended)</li>
+</ul>
+<h3 id="clan_setup">5.2 CLAN_SETUP</h3>
+<ul>
+<li>Register → <strong>C1</strong>; Approve identity → <strong>C_a</strong> + tenant <strong><code>TAM_NGUNG</code></strong>; open OP → <strong>C_op</strong> DRAFT</li>
+<li>SUBMIT → <strong>C_s</strong>; START_REVIEW → <strong>C_r</strong></li>
+<li>APPROVE blocked đúng: thiếu <code>birth_month</code>/<code>birth_day</code>; thiếu <code>generation</code> (≥ 1 bắt buộc SETUP)</li>
+<li>Sau bổ sung BP: APPROVE → <code>CHINH_THUC</code> (Đỗ Văn A); case <code>APPROVED</code></li>
+<li>Không auto <code>HOAT_DONG</code>; không auto <code>CLAN_ADMIN</code> user role</li>
+</ul>
+<h3 id="test-scripts-c6">5.3 Test scripts C6</h3>
+
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>Mục đích</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test-srpf-c6-smoke.js</code></td>
+<td>register + registry + loader + correlation policy</td>
+</tr>
+<tr>
+<td><code>test-srpf-c6-open.js</code></td>
+<td><code>openMemberPromoteInstance</code> idempotent</td>
+</tr>
+<tr>
+<td><code>test-srpf-c6-submit-once.js</code></td>
+<td>DRAFT|NEEDS_REVISION → SUBMITTED</td>
+</tr>
+<tr>
+<td><code>test-srpf-c6-approve.js</code></td>
+<td>START_REVIEW → APPROVE → CHINH_THUC</td>
+</tr>
+</tbody>
+</table><hr>
+<h2 id="quyết-định-nghiệp-vụ-giữ-nguyên-không-đổi-trong-c6">6. Quyết định nghiệp vụ giữ nguyên (không đổi trong C6)</h2>
+<ul>
+<li><strong>Trigger OP:</strong> mỗi create member <code>DU_BI</code> → open OP DRAFT (C mới); RP Approve là một nguồn.</li>
+<li><strong>Quyền A/B/C:</strong> tạo <code>DU_BI</code> / mở instance / vận hành (USER draft–submit; Admin review–approve).</li>
+<li><strong>BP hard trên APPROVE:</strong> <code>full_name</code>, <code>gender</code>, <code>is_alive</code>, <code>birth_year</code>, <code>birth_month</code>, <code>birth_day</code>.</li>
+<li><strong>generation:</strong> hard ≥ 1 <code>CLAN_SETUP</code>; strongly recommended <code>MEMBER_JOIN</code>.</li>
+<li><strong>Notification map:</strong> <code>MEMBER_PROMOTE_*</code> → <code>ONBOARDING_*</code> enum.</li>
+<li><strong>audit action:</strong> <code>THEM_MOI</code> | <code>CAP_NHAT</code> | <code>XOA</code>; <code>changed_by</code> chỉ UUID user hợp lệ.</li>
+</ul>
+<hr>
+<h2 id="rủi-ro--nợ-kỹ-thuật">7. Rủi ro &amp; nợ kỹ thuật</h2>
+
+<table>
+<thead>
+<tr>
+<th>Mục</th>
+<th>Mức</th>
+<th>Ghi chú</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>registerMemberPromote</code> chưa gọi nếu routes/app quên wire</td>
+<td>Trung</td>
+<td>Tests tự register; production cần routes/app chắc chắn</td>
+</tr>
+<tr>
+<td>Fallback require registry trong definition (path cũ)</td>
+<td>Thấp</td>
+<td>OK khi truyền registry; nên sửa path fallback shared</td>
+</tr>
+<tr>
+<td>PATH comment Q2 còn ghi shared/ trên file đã move</td>
+<td>Thấp</td>
+<td>Sửa khi đụng file</td>
+</tr>
+<tr>
+<td>open OP không ghi BPL</td>
+<td>Thấp</td>
+<td>Có thể bổ sung sau nếu cần audit “OPEN_OP”</td>
+</tr>
+<tr>
+<td><code>process_instances</code> model</td>
+<td>Thấp / Dài hạn</td>
+<td>Vẫn temporary <code>onboarding_cases</code></td>
+</tr>
+<tr>
+<td>Definition còn chỗ <code>throw Error</code> lẻ</td>
+<td>Thấp</td>
+<td>Ưu tiên <code>srpfError</code> đồng bộ CED</td>
+</tr>
+</tbody>
+</table><hr>
+<h2 id="hướng-dẫn-vận-hành-sau-bàn-giao">8. Hướng dẫn vận hành sau bàn giao</h2>
+<ul>
+<li>Mọi <code>executeAction MEMBER_PROMOTE</code>: đảm bảo đã <code>registerMemberPromote()</code>.</li>
+<li>Trace RP→OP: <code>metadata.source_register_case_id</code> + <code>source_register_correlation_id</code>.</li>
+<li>Trace action: dùng <strong>C trên BPL/notifications</strong>; không dùng C-action để tìm case.</li>
+<li>Fixture: <strong>không</strong> <code>UPDATE</code> case RP <code>APPROVED</code> thành <code>NEEDS_REVISION</code>.</li>
+</ul>
+<hr>
+<h2 id="tài-liệu--code-tham-chiếu">9. Tài liệu &amp; code tham chiếu</h2>
+<ul>
+<li>CM-Docs: <code>Register-to-OP-Handoff-Contract-2026-08-13</code></li>
+<li>CM-Docs: <code>Standard-Revision-Process-Framework-SRPF-v1.0-Final</code></li>
+<li>CM-Docs: <code>HandOver-Register-Process-Closure-2026-08-10</code> (RP CLOSED)</li>
+<li>cmcodes: <code>Backend/src/shared/frameworks/srpf/</code></li>
+<li>cmcodes: <code>Backend/src/modules/onboarding/srpf/</code></li>
+<li>cmcodes: <code>Backend/src/modules/auth/auth.service.js</code> (C3 handoff)</li>
+</ul>
+<hr>
+<h2 id="kết-luận--phê-duyệt-đóng-c6">10. Kết luận &amp; phê duyệt đóng C6</h2>
+<p>C6 đạt DoD: engine/shared tách khỏi OP realization; bootstrap register rõ; E2E <code>MEMBER_JOIN</code> và <code>CLAN_SETUP</code> đã PASS trên môi trường dev; mô hình <strong>C-root vs C-action</strong> đã kiểm chứng bằng SQL thật.</p>
+
+<table>
+<thead>
+<tr>
+<th>Hạng mục</th>
+<th>Giá trị</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Status C6</strong></td>
+<td><strong>COMPLETE — Ready to Close</strong></td>
+</tr>
+<tr>
+<td>Ngày</td>
+<td>2026-08-15</td>
+</tr>
+<tr>
+<td>Khuyến nghị</td>
+<td>Đóng C6; next: FE/API OP hoặc polish (wire routes chắc, Q2 PATH headers)</td>
+</tr>
+<tr>
+<td>Thay đổi sau đóng</td>
+<td>Amendment versioned; không sửa âm thầm contract C</td>
+</tr>
+</tbody>
+</table><hr>
+<p><em>End of HandOff-C6-OP-SRPF-Move-Correlation v1.0.0-FINAL</em></p>
+</div>
+</body>
+
+</html>
