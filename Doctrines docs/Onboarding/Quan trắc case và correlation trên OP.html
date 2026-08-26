@@ -1,0 +1,317 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>new one</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><p><strong>QUAN SÁT OP (<code>MEMBER_PROMOTE</code>) — status &amp; <code>correlation_id</code> © theo thiết kế</strong></p>
+<p>Hai “trục” cần tách:</p>
+
+<table>
+<thead>
+<tr>
+<th>Trục</th>
+<th>Ý nghĩa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>onboarding_cases.status</code></strong></td>
+<td>Trạng thái <strong>instance OP</strong> (DRAFT → … → APPROVED)</td>
+</tr>
+<tr>
+<td><strong><code>members.status</code></strong></td>
+<td>Trạng thái <strong>thành viên</strong> (<code>DU_BI</code> → <code>CHINH_THUC</code> chỉ khi APPROVE)</td>
+</tr>
+<tr>
+<td><strong><code>correlation_id</code> ©</strong></td>
+<td>ID theo dõi <strong>một</strong> process instance / chuỗi BPL gắn case đó</td>
+</tr>
+</tbody>
+</table><hr>
+<h3 id="mở-op-sau-rp-duyệt--tạo-member-du_bi">1. Mở OP (sau RP duyệt / tạo member DU_BI)</h3>
+<p><strong>Ai:</strong> BE <code>openMemberPromoteInstance</code> (handoff Register → OP).</p>
+
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Giá trị</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>process_kind</code></td>
+<td><code>MEMBER_PROMOTE</code></td>
+</tr>
+<tr>
+<td><code>case_type</code></td>
+<td><code>MEMBER_JOIN</code> hoặc <code>CLAN_SETUP</code></td>
+</tr>
+<tr>
+<td><strong><code>status</code></strong></td>
+<td><strong><code>DRAFT</code></strong></td>
+</tr>
+<tr>
+<td><strong><code>correlation_id</code></strong></td>
+<td><strong>UUID mới</strong> (một C cho cả đời instance OP này)</td>
+</tr>
+<tr>
+<td><code>primary_member_id</code></td>
+<td>member <code>DU_BI</code></td>
+</tr>
+<tr>
+<td><code>user_id</code></td>
+<td>user liên kết</td>
+</tr>
+</tbody>
+</table><p><strong>BPL lúc mở (nếu có log):</strong> thường một dòng create/open với <strong>cùng C</strong>; <code>process_type</code> tùy implement (không đổi status case ngoài DRAFT).</p>
+<p><strong>Không đổi:</strong> <code>members.status = DU_BI</code>.</p>
+<hr>
+<h3 id="lưu-nháp-base-profile-put-membersid">2. Lưu nháp Base Profile (<code>PUT /members/:id</code>)</h3>
+
+<table>
+<thead>
+<tr>
+<th>Bảng</th>
+<th>Thay đổi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>members</code></td>
+<td>Cập nhật field (tên, sinh, generation…)</td>
+</tr>
+<tr>
+<td><strong><code>onboarding_cases.status</code></strong></td>
+<td><strong>Giữ <code>DRAFT</code></strong></td>
+</tr>
+<tr>
+<td><strong><code>correlation_id</code></strong></td>
+<td><strong>Không đổi</strong></td>
+</tr>
+<tr>
+<td>BPL</td>
+<td>Có thể <strong>không</strong> ghi, hoặc log “profile save” với <strong>cùng C</strong> (nếu có)</td>
+</tr>
+</tbody>
+</table><p>Đây là lý do nhìn case vẫn <code>DRAFT</code> sau Lưu nháp — <strong>đúng</strong>.</p>
+<hr>
+<h3 id="gửi-duyệt-post-...casescaseidsubmit-—-chỗ-bạn-vừa-pass">3. Gửi duyệt (<code>POST .../cases/:caseId/submit</code>) — chỗ bạn vừa PASS</h3>
+
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Trước</th>
+<th>Sau (kỳ vọng)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>onboarding_cases.status</code></td>
+<td><code>DRAFT</code> (hoặc <code>NEEDS_REVISION</code>)</td>
+<td><strong><code>SUBMITTED</code></strong></td>
+</tr>
+<tr>
+<td><code>submitted_at</code></td>
+<td>null</td>
+<td>timestamp</td>
+</tr>
+<tr>
+<td><strong><code>correlation_id</code></strong></td>
+<td>C₀</td>
+<td><strong>Vẫn C₀</strong> (không sinh C mới)</td>
+</tr>
+<tr>
+<td><code>members.status</code></td>
+<td><code>DU_BI</code></td>
+<td><strong><code>DU_BI</code></strong> (chưa chính thức)</td>
+</tr>
+</tbody>
+</table><p><strong>BPL kỳ vọng:</strong> 1 bản ghi <code>process_type ≈ ONBOARDING_SUBMIT</code> (hoặc map SRPF SUBMIT), <strong><code>correlation_id = C₀</code></strong>, payload có <code>previous_status: DRAFT</code>.</p>
+<p>Nếu sau submit mà <strong>status case vẫn DRAFT</strong> → update status trong <code>submitCase</code> chưa chạy / nhánh OP khác nhánh bạn quan sát.<br>
+Nếu <strong>BPL không có dòng mới</strong> hoặc <strong>C khác</strong> → logger/correlation wiring lệch SSOT.</p>
+<hr>
+<h3 id="admin-bắt-đầu-review-b2-—-start_review">4. Admin bắt đầu review (B2 — <code>START_REVIEW</code>)</h3>
+
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Kỳ vọng</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>status</code></td>
+<td><code>SUBMITTED</code> → <strong><code>UNDER_REVIEW</code></strong></td>
+</tr>
+<tr>
+<td><code>correlation_id</code></td>
+<td><strong>Cùng C₀</strong></td>
+</tr>
+<tr>
+<td><code>members.status</code></td>
+<td>vẫn <code>DU_BI</code></td>
+</tr>
+</tbody>
+</table><p>BPL: <code>ONBOARDING_REVIEW_START</code>, cùng C.</p>
+<hr>
+<h3 id="a.-trả-về-sửa-return_for_revision">5a. Trả về sửa (<code>RETURN_FOR_REVISION</code>)</h3>
+
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Kỳ vọng</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>status</code></td>
+<td>→ <strong><code>NEEDS_REVISION</code></strong> (+ <code>review_note</code>)</td>
+</tr>
+<tr>
+<td><code>correlation_id</code></td>
+<td><strong>Cùng C₀</strong></td>
+</tr>
+<tr>
+<td>Member</td>
+<td>vẫn <code>DU_BI</code></td>
+</tr>
+</tbody>
+</table><p>User sửa → Lưu nháp (status có thể vẫn <code>NEEDS_REVISION</code>) → Submit lại → <strong><code>SUBMITTED</code></strong> lại, <strong>vẫn C₀</strong>.</p>
+<hr>
+<h3 id="b.-duyệt-approve">5b. Duyệt (<code>APPROVE</code>)</h3>
+
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Kỳ vọng</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>onboarding_cases.status</code></td>
+<td>→ <strong><code>APPROVED</code></strong> (terminal)</td>
+</tr>
+<tr>
+<td><strong><code>members.status</code></strong></td>
+<td><strong><code>DU_BI</code> → <code>CHINH_THUC</code></strong> (side-effect definition)</td>
+</tr>
+<tr>
+<td><code>correlation_id</code></td>
+<td><strong>Cùng C₀</strong> đến hết instance</td>
+</tr>
+<tr>
+<td>User <code>role</code></td>
+<td><strong>không</strong> auto <code>CLAN_ADMIN</code></td>
+</tr>
+</tbody>
+</table><p>BPL: <code>ONBOARDING_APPROVE</code>, cùng C.</p>
+<hr>
+<h3 id="c.-từ-chối-reject">5c. Từ chối (<code>REJECT</code>)</h3>
+
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Kỳ vọng</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Case</td>
+<td>→ <strong><code>REJECTED</code></strong> (terminal)</td>
+</tr>
+<tr>
+<td>Member</td>
+<td>thường <strong>vẫn <code>DU_BI</code></strong> (trừ khi policy khác)</td>
+</tr>
+<tr>
+<td>C</td>
+<td><strong>Cùng C₀</strong></td>
+</tr>
+</tbody>
+</table><hr>
+<h3 id="sơ-đồ-rút-gọn">Sơ đồ rút gọn</h3>
+<pre class=" language-text"><code class="prism  language-text">[Open OP]  case=DRAFT, member=DU_BI, C = C0 (mới)
+    │
+    ├─ Lưu nháp ──► case=DRAFT (không đổi), member fields cập nhật, C=C0
+    │
+    └─ Gửi duyệt ─► case=SUBMITTED, member=DU_BI, C=C0
+                        │
+           ┌────────────┼────────────┐
+           ▼            ▼            ▼
+     UNDER_REVIEW  (optional)   (một số flow gộp)
+           │
+     ┌─────┴─────┐
+     ▼           ▼
+NEEDS_REVISION  APPROVED / REJECTED
+     │              │
+  Submit lại    member=CHINH_THUC (chỉ APPROVED)
+  → SUBMITTED       C vẫn = C0
+</code></pre>
+<hr>
+<h3 id="correlation_id-—-nguyên-tắc"><code>correlation_id</code> — nguyên tắc</h3>
+
+<table>
+<thead>
+<tr>
+<th>Sự kiện</th>
+<th>C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tạo instance OP</td>
+<td><strong>Sinh C mới</strong></td>
+</tr>
+<tr>
+<td>Mọi action trên <strong>cùng case</strong> (save, submit, review, approve)</td>
+<td><strong>Giữ nguyên C</strong></td>
+</tr>
+<tr>
+<td>OP <strong>mới</strong> (member khác / instance khác)</td>
+<td>C <strong>khác</strong></td>
+</tr>
+<tr>
+<td>RP (REGISTER) trước đó</td>
+<td>C <strong>của RP</strong> — <strong>không</strong> trộn với C OP (metadata có thể trỏ <code>source_register_correlation_id</code>)</td>
+</tr>
+</tbody>
+</table><hr>
+<h3 id="vì-sao-quan-sát-“status--bpl-không-đổi-đúng”">Vì sao quan sát “status / BPL không đổi đúng”</h3>
+<p>Thường gặp:</p>
+<ol>
+<li><strong>Lưu nháp</strong> không đụng <code>onboarding_cases.status</code> → nhìn case vẫn DRAFT (đúng).</li>
+<li><strong>Submit</strong> đã 200 nhưng UI/DB bạn xem <strong>replica / cache / case id khác</strong>.</li>
+<li><strong>BPL</strong> ghi <code>correlationId</code> từ request header <strong>khác</strong> <code>cases.correlation_id</code> → trông như “C nhảy”.</li>
+<li>Submit nhánh <strong>legacy</strong> vs <strong>SRPF</strong> không cùng chỗ update status + BPL.</li>
+</ol>
+<p><strong>Kiểm tra 1 case cụ thể (SQL ý tưởng):</strong></p>
+<pre class=" language-sql"><code class="prism  language-sql"><span class="token comment">-- case</span>
+<span class="token keyword">SELECT</span> id<span class="token punctuation">,</span> <span class="token keyword">status</span><span class="token punctuation">,</span> process_kind<span class="token punctuation">,</span> correlation_id<span class="token punctuation">,</span> submitted_at<span class="token punctuation">,</span> updated_at
+<span class="token keyword">FROM</span> onboarding_cases
+<span class="token keyword">WHERE</span> id <span class="token operator">=</span> <span class="token string">'&lt;caseId&gt;'</span><span class="token punctuation">;</span>
+
+<span class="token comment">-- BPL cùng C</span>
+<span class="token keyword">SELECT</span> id<span class="token punctuation">,</span> process_type<span class="token punctuation">,</span> correlation_id<span class="token punctuation">,</span> created_at<span class="token punctuation">,</span> payload
+<span class="token keyword">FROM</span> business_process  <span class="token comment">-- tên bảng đúng schema của bạn</span>
+<span class="token keyword">WHERE</span> correlation_id <span class="token operator">=</span> <span class="token string">'&lt;correlation_id của case&gt;'</span>
+<span class="token keyword">ORDER</span> <span class="token keyword">BY</span> created_at<span class="token punctuation">;</span>
+</code></pre>
+<p>Sau <strong>Gửi duyệt</strong> thành công: case phải <strong><code>SUBMITTED</code></strong>, <code>submitted_at</code> not null, BPL thêm 1 dòng SUBMIT <strong>cùng</strong> <code>correlation_id</code>.</p>
+<hr>
+<p>Nếu bạn paste 1 hàng <code>onboarding_cases</code> (status, process_kind, correlation_id, submitted_at) <strong>trước/sau</strong> Gửi duyệt + vài dòng BPL cùng C, có thể chỉ đúng chỗ lệch (status không update vs BPL sai C).</p>
+</div>
+</body>
+
+</html>
