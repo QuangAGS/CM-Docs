@@ -5,7 +5,6 @@ PATH       : BFA/A01-Profile-Task-Shell-2026-09-06.md
 DATETIME   : 2026-09-06T20:20:00+07:00
 VERSION    : 0.1.0-DRAFT
 STATUS     : APPROVED 
-SSOT CHA   : BFA/HandOver-M12-Member-Profile-2026-09-06.md
 BFA        : BFA-Post-OP-myClan-v2.2.0 + Amendment 2.2.1 + Amendment 2.2.2 (BL/CL)
              Tài liệu này KHÔNG sửa 2.2.0 / 2.2.1 / 2.2.2.
 REPOS      : QuangAGS/cmcodes (BE+FE) + CM-Docs

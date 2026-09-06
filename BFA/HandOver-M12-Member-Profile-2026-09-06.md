@@ -4,7 +4,8 @@
 PATH       : BFA/HandOver-M12-Member-Profile-2026-09-06.md
 DATETIME   : 2026-09-06T16:48:00+07:00
 VERSION    : 1.0.0-M12-CLOSE-UAT
-SSOT       : thay thế ngữ cảnh làm việc A01/M12 trên thread cũ
+SSOT       : thay thế ngữ cảnh làm việc A01/M12 trên thread cũ. 
+             Tương tác = A01-Profile-Task-Shell-2026-09-06.md
 REPOS      : QuangAGS/cmcodes (BE + FE) + CM-Docs
 RP/OP      : CLOSED. Không mở lại SM.
 ```
@@ -125,11 +126,14 @@ M12a creator stamp → M12c/d GET/PATCH member profile → M12f shared `/me?memb
 
 Repo tại thời điểm handover: kiểm tra `git log` cmcodes; chủ dự án có thể đã push M12n9.
 
+HA (header đã APPROVED, checklist còn trống)
+
 ## 11. Câu chốt cho prompt thread mới
 
 ```
 Tiếp myClan.com.vn.
 SSOT: BFA/HandOver-M12-Member-Profile-2026-09-06.md
+SSOT: tương tác = A01-Profile-Task-Shell-2026-09-06.md  Thread sau không mất file
 Repos QuangAGS/cmcodes + CM-Docs.
 RP/OP CLOSED. Không mở lại SM.
 Profile sống+chết tạm đóng để UAT. Chỉ mở lát nếu UAT ra phiếu.
