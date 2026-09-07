@@ -2,7 +2,7 @@
 
 **PATH** : CM-Docs/BFA/HandOver-A01-Profile-Media-2026-09-03  
 **DATETIME** : 2026-09-03T16:30:00+07:00  
-**VERSION** : 1.0.0  
+**VERSION** : 1.1.0  (bổ sung sau smoke)
 **REPO CODE** : QuangAGS/cmcodes (`Backend/` + `frontend/`)  
 **REPO DOCS** : QuangAGS/CM-Docs  
 **SSOT TRƯỚC** : HandOver-Post-OP-A01-2026-08-28 ; HandOver-BFA-222-B3-A01-BL-2026-09-01  
@@ -210,6 +210,25 @@ Domain prod: `myclan.com.vn`. R2 bucket SSOT env: khớp `R2_BUCKET` (đã từn
 **E.** G-media presign PUT dùng chung (sau khi A ổn).
 
 Không làm A+E cùng lúc.
+
+
+## Bổ sung VESION 1.1.0:
+
+## Dropdown mục hồ sơ — đọc liền vs làm một lá
+
+Giữ bốn key (một page, ?section=):
+
+| key | Việc |
+|---|---|
+| bio | Chọn chủ đề → form/file chủ đề đó |
+| bio_read | Đọc liền mọi chủ đề tiểu sử |
+| ach | Chọn nhóm+chi tiết → list (≥1) hoặc form (0) → Sửa/Xóa/Thêm |
+| ach_read | Đọc liền mọi thành tích |
+
+Không gộp bio↔bio_read, ach↔ach_read.
+Không tách 10 route.
+Lưu/F5: bio giữ bioTopic; ach giữ achCat+achSub.
+T0 / chưa chọn lá: dưới dropdown trống.
 
 ---
 

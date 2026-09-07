@@ -32,6 +32,7 @@ Người nhận thread: đọc mục 2–5 trước khi sinh code. Lát nhỏ. Q
 - Nút sửa: (1) `can_edit` hoặc CLAN_ADMIN/SYSTEM_ADMIN; (2) `dirty` theo **đúng mục đang mở**.
 - Audit không được nằm trong interactive TX hồ sơ (`writeAudit` → `logAction(..., null)`). TX PATCH `{ maxWait: 10000, timeout: 20000 }`.
 - `/me/profile` phải `can_edit: true` (SELF). Thread từng khóa nhầm avatar + Elder vì payload `can_edit: false`.
+- Dropdown Profile: giữ bio, bio_read, ach, ach_read (A01 Task Shell 2026-09-07). Không gộp.
 
 ## 3. Khóa (không đụng)
 
