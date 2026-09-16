@@ -1,8 +1,8 @@
 BFA — Học thuyết Chi / Gia đình
 
 PATH       : docs/BFA-Branch-Family-Doctrine-v1.0.md
-DATETIME   : 2026-09-12T10:45:00+07:00
-VERSION    : 1.0.0
+DATETIME   : 2026-09-16T14:45:00+07:00
+VERSION    : 2.0.0 UPERSEDED BY BFA-Branch-Family-Doctrine-v1.3.0
 STATUS     : Migrate 20260912081914
 SSOT-CÙNG  : BFA-Branch-v1.1.0 · HandOver-M13-Branch-2026-09-11
 KHÓA       : Q1 bảo toàn · ALS · EDITOR ≠ users.status · place ≠ usage
