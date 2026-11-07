@@ -1,0 +1,181 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0">
+  <diagram id="BPMN_RP_OP_2_4_0" name="RP va OP v2.4.0">
+    <mxGraphModel dx="1727" dy="1202" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1300" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="pool" parent="1" style="swimlane;html=1;childLayout=stackLayout;resizeParent=1;resizeParentMax=0;startSize=30;horizontal=0;fillColor=#f8fafc;strokeColor=#334155;fontStyle=1;fontSize=13;" value="QUY TRÌNH RP &amp; OP — v2.4.0 (MULTI-HOME + CLAIM)" vertex="1">
+          <mxGeometry height="1000" width="1700" x="40" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="lane_eu" parent="pool" style="swimlane;html=1;startSize=30;fillColor=#ffffff;strokeColor=#94a3b8;fontStyle=1;" value="NGƯỜI DÙNG CUỐI (EU)" vertex="1">
+          <mxGeometry height="240" width="1670" x="30" as="geometry" />
+        </mxCell>
+        <mxCell id="start" parent="lane_eu" style="ellipse;whiteSpace=wrap;html=1;fillColor=#22c55e;strokeColor=#16a34a;fontColor=#ffffff;fontStyle=1;" value="Bắt đầu" vertex="1">
+          <mxGeometry height="40" width="40" x="30" y="95" as="geometry" />
+        </mxCell>
+        <mxCell id="eu_auth" parent="lane_eu" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f5f9;strokeColor=#64748b;" value="Đăng ký &amp; OTP&#xa;(SĐT, Mật khẩu)" vertex="1">
+          <mxGeometry height="60" width="140" x="100" y="85" as="geometry" />
+        </mxCell>
+        <mxCell id="eu_select" parent="lane_eu" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f5f9;strokeColor=#64748b;" value="Chọn Dòng họ &amp;&#xa;link_type" vertex="1">
+          <mxGeometry height="60" width="150" x="280" y="85" as="geometry" />
+        </mxCell>
+        <mxCell id="gw_branch" parent="lane_eu" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef08a;strokeColor=#ca8a04;fontStyle=1;" value="Đã có tên&#xa;trong sổ?" vertex="1">
+          <mxGeometry height="90" width="120" x="470" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="eu_claim" parent="lane_eu" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;align=left;" value="Claim 3 Lớp:&#xa;• Chọn hồ sơ&#xa;• Trắc nghiệm gia mật&#xa;• Bảo lãnh" vertex="1">
+          <mxGeometry height="80" width="200" x="640" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="eu_new" parent="lane_eu" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#d97706;" value="Khai thông tin cá nhân&#xa;(Họ tên, ngày sinh, giới tính)" vertex="1">
+          <mxGeometry height="55" width="180" x="640" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="eu_mfo" parent="lane_eu" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#d97706;" value="MFO Workbench 5L&#xa;Dựng gia đình" vertex="1">
+          <mxGeometry height="55" width="160" x="860" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="eu_active" parent="lane_eu" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontStyle=1;" value="Hoạt động&#xa;(Clan Switcher)" vertex="1">
+          <mxGeometry height="60" width="160" x="1450" y="85" as="geometry" />
+        </mxCell>
+        <mxCell id="lane_be" parent="pool" style="swimlane;html=1;startSize=30;fillColor=#ffffff;strokeColor=#94a3b8;fontStyle=1;" value="BACKEND SERVICES &amp; ENGINE" vertex="1">
+          <mxGeometry height="250" width="1670" x="30" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="be_user" parent="lane_be" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f5f9;strokeColor=#64748b;" value="Tạo users&#xa;status = CHO_DUYET&#xa;(Chưa có quyền dòng họ)" vertex="1">
+          <mxGeometry height="70" width="170" x="100" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="be_check" parent="lane_be" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#ef4444;" value="Kiểm tra tranh chấp&#xa;trước khi tạo link" vertex="1">
+          <mxGeometry height="55" width="160" x="640" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="be_claim" parent="lane_be" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;" value="Tạo proposals (MEMBER_CLAIM)&#xa;Tạo user_member_links&#xa;status = PENDING" vertex="1">
+          <mxGeometry height="65" width="200" x="840" y="25" as="geometry" />
+        </mxCell>
+        <mxCell id="gw_dispute" parent="lane_be" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#ef4444;fontStyle=1;" value="Trùng&#xa;Claim?" vertex="1">
+          <mxGeometry height="70" width="100" x="1080" y="25" as="geometry" />
+        </mxCell>
+        <mxCell id="be_dispute" parent="lane_be" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#ef4444;" value="Đánh dấu&#xa;DISPUTED" vertex="1">
+          <mxGeometry height="50" width="120" x="1220" y="35" as="geometry" />
+        </mxCell>
+        <mxCell id="be_dubi" parent="lane_be" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#d97706;" value="Tạo Member DU_BI&#xa;Tạo user_member_links&#xa;(PENDING)" vertex="1">
+          <mxGeometry height="65" width="170" x="640" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="be_mfo" parent="lane_be" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#d97706;" value="Tạo proposals (MFO_REVIEW)&#xa;Lưu snapshot 5L" vertex="1">
+          <mxGeometry height="65" width="180" x="860" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="lane_adm" parent="pool" style="swimlane;html=1;startSize=30;fillColor=#ffffff;strokeColor=#94a3b8;fontStyle=1;" value="ADMIN DÒNG HỌ (CỔNG G01)" vertex="1">
+          <mxGeometry height="220" width="1670" x="30" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="adm_claim" parent="lane_adm" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;" value="Thẩm định Claim 3 lớp&#xa;(Gia mật + Bảo lãnh)" vertex="1">
+          <mxGeometry height="60" width="170" x="1080" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="adm_appr_claim" parent="lane_adm" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontStyle=1;" value="Phê duyệt Claim&#xa;(G01)" vertex="1">
+          <mxGeometry height="50" width="130" x="1300" y="35" as="geometry" />
+        </mxCell>
+        <mxCell id="adm_mfo" parent="lane_adm" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#d97706;" value="Thẩm định MFO 5L" vertex="1">
+          <mxGeometry height="50" width="160" x="860" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="adm_appr_mfo" parent="lane_adm" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontStyle=1;" value="Phê duyệt MFO&#xa;(G01)" vertex="1">
+          <mxGeometry height="50" width="130" x="1060" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="lane_db" parent="pool" style="swimlane;html=1;startSize=30;fillColor=#ffffff;strokeColor=#94a3b8;fontStyle=1;" value="DATABASE SSOT (PostgreSQL)" vertex="1">
+          <mxGeometry height="260" width="1670" x="30" y="710" as="geometry" />
+        </mxCell>
+        <mxCell id="db_claim" parent="lane_db" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#f8fafc;strokeColor=#475569;align=left;" value="TX CLAIM:&#xa;• user_member_links = DA_DUYET&#xa;• users.status = DA_DUYET (nếu chưa)&#xa;• Profile Correction nếu có diffs&#xa;• Partial unique index" vertex="1">
+          <mxGeometry height="120" width="240" x="1250" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="db_mfo" parent="lane_db" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#f8fafc;strokeColor=#475569;align=left;" value="TX MFO:&#xa;• members = CHINH_THUC&#xa;• parentages (BIOLOGICAL)&#xa;• user_member_links = DA_DUYET" vertex="1">
+          <mxGeometry height="110" width="220" x="1000" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="f1" edge="1" parent="pool" source="start" target="eu_auth">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f2" edge="1" parent="pool" source="eu_auth" target="be_user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f3" edge="1" parent="pool" source="be_user" target="eu_select">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f4" edge="1" parent="pool" source="eu_select" target="gw_branch">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f5" edge="1" parent="pool" source="gw_branch" target="eu_claim">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="530" y="60" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="f5l" connectable="0" parent="f5" style="edgeLabel;html=1;fontColor=#0284c7;fontStyle=1;" value="ĐÃ CÓ" vertex="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f6" edge="1" parent="pool" source="eu_claim" target="be_check">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f7" edge="1" parent="pool" source="be_check" target="be_claim">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f8" edge="1" parent="pool" source="be_claim" target="gw_dispute">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f9" edge="1" parent="pool" source="gw_dispute" target="be_dispute">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f9l" connectable="0" parent="f9" style="edgeLabel;html=1;fontColor=#ef4444;" value="Trùng" vertex="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f10" edge="1" parent="pool" source="gw_dispute" target="adm_claim">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f11" edge="1" parent="pool" source="be_dispute" target="adm_claim">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f12" edge="1" parent="pool" source="adm_claim" target="adm_appr_claim">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f13" edge="1" parent="pool" source="adm_appr_claim" target="db_claim">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f14" edge="1" parent="pool" source="db_claim" target="eu_active">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1530" y="820" />
+              <mxPoint x="1530" y="115" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="f15" edge="1" parent="pool" source="gw_branch" target="eu_new">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="530" y="170" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="f15l" connectable="0" parent="f15" style="edgeLabel;html=1;fontColor=#d97706;fontStyle=1;" value="CHƯA CÓ" vertex="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f16" edge="1" parent="pool" source="eu_new" target="be_dubi">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f17" edge="1" parent="pool" source="be_dubi" target="eu_mfo">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f18" edge="1" parent="pool" source="eu_mfo" target="be_mfo">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f19" edge="1" parent="pool" source="be_mfo" target="adm_mfo">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f20" edge="1" parent="pool" source="adm_mfo" target="adm_appr_mfo">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f21" edge="1" parent="pool" source="adm_appr_mfo" target="db_mfo">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="f22" edge="1" parent="pool" source="db_mfo" target="eu_active">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1110" y="900" />
+              <mxPoint x="1500" y="900" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
