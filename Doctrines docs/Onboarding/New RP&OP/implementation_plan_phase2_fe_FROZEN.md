@@ -1,9 +1,11 @@
 # IMPLEMENTATION PLAN CHI TIẾT — PHASE 2 FRONTEND (v1.8-FROZEN)
 
 * **Dự án:** New RP&OP — Phase 2 (Frontend)
-* **Mã tài liệu:** `IMPL-PLAN-FE-PHASE2-V1.8-ISO29148`
-* **Ngày phê chuẩn:** `19/11/2026`
-* **Tài liệu tham chiếu:** `AMEND-RP-OP-2026-03-BASELINE (v7.0 FROZEN)`
+* **Mã tài liệu:** `IMPL-PLAN-FE-PHASE2-V1.9-ISO29148`
+* **Ngày phê chuẩn:** `22/11/2026`
+* **Lịch sử sửa đổi:**
+  * `v1.9 (22/11/2026)`: Đồng bộ UAT-IMP6 (Giao diện 4 câu hỏi CLAN_SETUP, hiển thị đếm ngược Sandbox 30d/30d, xóa cản trở elder_name, 1-row layout, RulesAgreementCard).
+* **Tài liệu tham chiếu:** `AMEND-RP-OP-2026-03-BASELINE (v7.1)`
 * **Đồng bộ Backend:** `gia-pha-backend` (`main` @ `64876e3`)
 * **Công nghệ đích:** React 18.2, Vite 5.1, JavaScript ESM (`.js` / `.jsx`), Tailwind CSS, `@tanstack/react-query`, hệ thống `elder-doctrine`.
 * **Trạng thái:** `FROZEN / APPROVED FOR EXECUTION`
@@ -81,7 +83,7 @@ Các nguyên tắc sau bắt buộc tuân thủ 100%, không ngoại lệ, nhằ
 * `src/features/onboarding/constants/phase2ErrorMap.js` (Tạo mới)
 * `src/components/common/PersistentMessageBanner.jsx` (Tạo mới: Hiển thị Correlation ID, xử lý fallback *"Không có"*)
 * `src/components/common/BlockingLoadingOverlay.jsx` (Tạo mới: Loading duy nhất)
-* `src/hooks/useTurnstileFailClosed.js` (Tạo mới: Xử lý auto-retry an toàn, bắt lỗi fail CAPTCHA)
+* `src/shared/hooks/useTurnstileFailClosed.js` (Tạo mới: Xử lý auto-retry an toàn, bắt lỗi fail CAPTCHA)
 * `src/lib/apiClient.js` (Sửa đổi: Đọc `response.headers['x-correlation-id']`)
 
 ### Sprint FE-2: Tìm kiếm Công khai, Claim & Bypass OTP
@@ -124,6 +126,7 @@ Các nguyên tắc sau bắt buộc tuân thủ 100%, không ngoại lệ, nhằ
 | `[ARCH-05]` | Ẩn R2 Staging Link | `OpCaseDetailPage.jsx` | `TC-FE-16` | 
 | `[ARCH-06]` | 3 khóa Metadata | `onboardingPhase2Contracts.js` | `TC-FE-17` | 
 | `[NFR-FE-02]` | **Voice Assist (Elder)** | **Tất cả các màn hình Phase 2** | `TC-FE-18` |
+| `[ARCH-06]` | **Sandbox 30d/30d** | `AdminTenantDirectoryPage.jsx` | `TC-FE-19` |
 
 ## 6. KỊCH BẢN KIỂM CHỨNG (ACCEPTANCE CRITERIA)
 
@@ -145,3 +148,4 @@ Các nguyên tắc sau bắt buộc tuân thủ 100%, không ngoại lệ, nhằ
 12. **TC-FE-15 (Con rể/Con dâu Claim):** *Given* API `claim-search` trả về người `is_clan=false` và `is_claimed=true`, *Then* hiện nhãn "Con dâu" và text inline "Đã có tài khoản", nút chọn bị khóa cứng.
 13. **TC-FE-16 (Hide R2 Links):** *Given* hồ sơ `EXPIRED`, *When* Admin mở chi tiết, *Then* nút tải File bị ẩn đi, thay bằng text "Tệp nháp đã bị xóa".
 14. **TC-FE-18 (Voice Assist - Elder Doctrine):** *Given* User ở bất kỳ form/page nào của Phase 2, *When* bấm vào `AudioHelpButton` ở header hoặc `ZoneVoiceButton` ở trường nhập liệu, *Then* hệ thống phát âm thanh hướng dẫn chính xác thông qua `TtsContext` mà không ảnh hưởng tới state của form.
+15. **TC-FE-19 (Sandbox Lifecycle UAT-IMP6):** *Given* Admin vào danh bạ dòng họ, *When* lọc Sandbox, *Then* hiển thị rõ huy hiệu "Đang dựng cây (Sandbox)", số ngày còn lại (hoặc số ngày chờ dọn dẹp `TAM_NGUNG`).

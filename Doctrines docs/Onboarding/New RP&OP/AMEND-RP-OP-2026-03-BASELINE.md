@@ -1,10 +1,12 @@
 # AMENDMENT TO NEW RP&OP — PHASE 2 (FINAL FROZEN BASELINE)
 
 * **Mã tài liệu:** `AMEND-RP-OP-2026-03-BASELINE`
-* **Phiên bản:** `7.0 (FINAL FROZEN APPROVED - ISO 29148 CERTIFIED)`
+* **Phiên bản:** `7.1 (UAT-IMP6 - SANDBOX LIFECYCLE & CLAN SETUP RULES)`
 * **Trạng thái:** `FROZEN / READY FOR IMPLEMENTATION (SPRINT 1 KICKOFF)`
 * **Ngày phê chuẩn:** `18/11/2026`
-* **Phạm vi:** Bối cảnh nghiệp vụ, Chuẩn hóa Form (RPAP), Lát 0, Concurrency, Multi-Home, Guardian, Ledgers, Logic-tier Rate-limit, Xử lý biên và Ma trận Truy vết.
+* **Phạm vi:** Bối cảnh nghiệp vụ, Chuẩn hóa Form (RPAP), Lát 0, Concurrency, Multi-Home, Guardian, Ledgers, Logic-tier Rate-limit, Xử lý biên, Vòng đời Sandbox và Ma trận Truy vết.
+* **Lịch sử sửa đổi:**
+  * `v7.1 (22/11/2026)`: Tích hợp UAT-IMP6 (Bỏ ràng buộc tuổi người xác minh CLAN_SETUP, áp dụng Sandbox 30 ngày + Đệm 30 ngày, giới hạn tạo 2 dòng họ/30 ngày).
 
 ## 0.0. THUẬT NGỮ & ĐỊNH NGHĨA (GLOSSARY)
 
@@ -132,12 +134,33 @@ Bắt buộc tuân thủ thứ tự khóa một chiều sau trong DB transaction
 ### `[FUNC-10]` Token Invalidation (Functional)
 * Hủy toàn bộ token (OTP, referral, beneficiary) ngay lập tức (chạy đồng bộ) khi State Machine chuyển case sang các trạng thái kết thúc (`APPROVED`, `REJECTED`, `CANCELLED`, `EXPIRED`).
 
-### `[ARCH-06]` Quy chuẩn Namespace JSON (Constraint)
-* Mọi cấu trúc JSON động lưu trên case phải đưa vào namespace chuẩn để tránh xung đột key. Cấu trúc yêu cầu:
+### `[ARCH-06]` Thẩm định Khởi tạo Dòng họ & Namespace JSON (Constraint)
+* Mọi cấu trúc JSON động lưu trên case phải đưa vào namespace chuẩn để tránh xung đột key.
+* **Hồ sơ CLAN_SETUP (`metadata.registration_profile`):**
+  * Bãi bỏ ràng buộc người cao niên $\ge 60$ tuổi. `elder_name` và `elder_phone` chuyển thành tùy chọn.
+  * Bắt buộc 4 trường thẩm định: `setup_purpose` (Mục đích lập họ), `known_generations` (Số đời dự kiến), `earliest_ancestor_name` (Vị tiền nhân cao nhất), `clan_origin_place` (Địa bàn gốc).
+* **Namespace hệ thống:**
   * `metadata.staging_cleanup`: `{ cleanup_status: 'PENDING' | 'CLEANED' | 'FAILED', prefix: string }`
   * `metadata.offline_verifications`: `[{ id: string, endorser_name: string, call_status: 'VERIFIED' | 'UNREACHABLE' }]`
-* Không lưu phẳng tại root.
+* Khách mới tạo `CLAN_SETUP`: Mỗi tài khoản/SĐT chỉ được duy trì tối đa 1 hồ sơ `CHO_DUYET` tại một thời điểm, và lập tối đa 2 dòng họ trong vòng 30 ngày.
 
+
+## 6.5. VÒNG ĐỜI DÙNG THỬ SANDBOX & HẬU KIỂM (SANDBOX LIFECYCLE)
+
+Toàn bộ vòng đời từ lúc đề xuất lập dòng họ đến khi dọn dẹp dữ liệu được ánh xạ trực tiếp lên bảng `tenants` (cột `status` và `social_configs`):
+1. **Đề xuất lập họ (`CHO_DUYET`):** Dòng họ chưa mở công khai; `SYSTEM_ADMIN` đối chiếu trùng lặp tên/địa bàn gốc.
+2. **Dùng thử Sandbox (`HOAT_DONG` + `isSandbox: true`):**
+   * Thời hạn: **30 ngày** (lưu `sandboxStartedAt`, `sandboxExpiresAt`).
+   * Trưởng họ được dựng phả hệ ban đầu miễn phí; giới hạn mời diện rộng.
+   * Nhắc hạn: Hệ thống cảnh báo CLAN_ADMIN khi còn **7 ngày** và **3 ngày**.
+3. **Vận hành chính thức (`HOAT_DONG` + `isSandbox: false`):** Khi đóng góp hạ tầng hoàn tất, gỡ cờ Sandbox, mở full tính năng (lưu `activatedAt`).
+4. **Thời gian đệm (`TAM_NGUNG` + `isSandbox: true`):**
+   * Quá hạn 30 ngày Sandbox chưa kích hoạt $\rightarrow$ Chuyển `TAM_NGUNG`.
+   * Thời hạn đệm: **30 ngày** (lưu `sandboxSuspendedAt`, `sandboxCleanupDueAt`).
+   * Bảo toàn 100% dữ liệu đã dựng, nhưng khóa ghi dữ liệu mới. CLAN_ADMIN có thể nộp phí để phục hồi `HOAT_DONG`.
+5. **Đóng vĩnh viễn & Dọn dẹp (`NGUNG_HAN` + `isSandbox: false`):**
+   * Quá 30 ngày đệm $\rightarrow$ Chuyển `NGUNG_HAN` và thực thi xóa cứng toàn bộ dữ liệu dùng thử (`members`, `branches`, `parentages`, v.v.). **Không thể khôi phục.**
+   * Giữ lại bản ghi `tenants` (`NGUNG_HAN`) để lưu vết.
 ## 7. SCHEMA DIFF BỔ SUNG
 
 ### `[ARCH-05]` Ràng buộc CSDL (Constraint)
